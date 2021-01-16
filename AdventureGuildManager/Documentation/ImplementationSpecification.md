@@ -1,60 +1,78 @@
-Nasleduj˙ca öpecifik·cia je prerobenÌm pÙvodnej öpecifik·cie do jednoduchöej varianty.
-T·to varianta m· uËel vytvoriù baliky pr·ce, kde po kaûdom balÌku pr·ce sa bude moûnÈ,
-rozhodn˙ù, Ëi pokraËovaù dalöÌm alebo skonËiù a pok˙siù sa odovzdaù st·vajuce rieöenie.
+A. [Architecture]
+	This paragraph explains architecture of this project.
 
-TÈma: Adventure Guild Manager
-Hr·Ë manaûuje guildu hrdninÛv a dobrodruhÛv. Manaûovanie pokr˝va:
-- manaûment dobrodruha
-	- prÌjmanie do sluûieb
-	- ukonËenie sluûby dobdrodruha
-	- vylepöovanie dobrodruhÛv
-		- levelovanie
-		- spr·va vybavenia
-- manaûment skupÌn dobdrodruhov
-	- vytvorenie
-	- zruöenie
-	- upravenie
-- manaûment questov
-	- prÌmanie questov
-	- ruöenie questov
-	- posielanie dobrodruhov na quest
-	- posielanie skupin na quest
+B. Command Specification:
+- Each command is one line of input.
+- First is command_name, followed by command_parameters/command_arguments separated by spaces.
+- White/Space characters are used as separator and are all purged from input line.
 
-Overview of entities:
-	- Quest:
-		- Reward # invoked on quest state success
-		- Penalty # invoked on quest state failure
-		- Canceled (Cancelation Fee) # invoked on quest state cancel
-		- ExpirationTime # time at which quest is canceled automatically
-		- CompletitionTime # time required to finish, started quest cant fail due to time
-		- State # represents current state of quest
-			- New # new quest that was neither accepted or canceled
-			- Accepted # quest that is in progress by adventurer
-			- Canceled # quest canceled by guild, pays cancelation fee
-			- Success # quest that was completed, receive reward
-			- Failure # quest that was not completed successfully, pays penalty
-		- QuestResolutionRules # how is quest resolved after expiration of completition time
+E. [Entities]
+	This paragraph contains overview of all entities used in the project in simplified manner.
+	[GameWorld]
+		* Collection<Player.Id, Player> Players
+		* Collection<Player.Id, Guild.Id> PlayerGuildPairs
+		* GuildKeeper Guilds
+		[Player]
+			* Id
+			* Name
+		[GuildKeeper]
+			* Collection<Guild.Id, Guild> Guilds
+			[Guild]
+				* Id
+				* Name
+				[GuildResources]
+					* int Gold
+					* int Fame
+				[GuildStats]
+					* int Difficulty
+					* int Prestige Level
 
-	- Quest History : History
-		- Quest Failed
-		- Quest Success
-		- Quest Canceled
-		- Quest Total
+	[Guild]
+		* Perks AvailablePerks
+		* AdventurerKeeper AdventurersKeeper
+		* QuestKeeper QuestKeeper
+	[AdventurerKeeper]
+		* collection Adventurers
+	[QuestKeeper]
+		* collection Quests
+		* Collection<Quest> QuestFailed
+		* int questFailed	
+	[Quest] 
+		* string Name	
+		* int Id	
+		* int Difficulty	
+		* QuestType Type
+		* Reward Reward
+		* Penalty Penalty
+		[QuestType] 
+		[Reward] 
+			* int Gold
+			* int Fame
+		[Penalty] 
+			* bool Deadly
+			* int Gold
+			* int Fame
+	[Adventurer] 
+		* string Name	
+		* int RecruitmentCost
+		* int RetirementCost
+		* int LivingExpenses
+		* int Experience
+		* int Level
+		* Collection<Skill> Skills
+		[Skill] 
+			* int Id
+	[GuildDispatcher] 
+	[CommandLineInputParser] 
+	[CommandLineOutputPrinter] 
+	[CommandLineCommandController]
+	
+S. [Steps]
+	This paragraph describes individual steps of the implementation.
 
-	- Guild:
-		- Budget # current guild money value
-		- Fame # current guild fame value
-		- History # collection of all history objects
+Game Developement Steps:
 
-
-Guild
- - Members
- - Capital
-
-
- Game Developement Steps:
-
- 1. It does nothing but it's glorious
+1. It does nothing but it's glorious
 	Expected Blocks of Code:
 		- [CL-IP] CommandLine Input Parser
 			* Responsible for handling all user input.
