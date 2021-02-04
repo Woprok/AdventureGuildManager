@@ -1,4 +1,4 @@
-#ifndef CONSOLE_HELPERS_HPP
+﻿#ifndef CONSOLE_HELPERS_HPP
 #define CONSOLE_HELPERS_HPP
 
 #include <algorithm>

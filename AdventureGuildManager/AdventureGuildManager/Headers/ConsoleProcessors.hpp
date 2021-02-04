@@ -1,4 +1,4 @@
-#ifndef CONSOLE_PROCESSORS_HPP
+﻿#ifndef CONSOLE_PROCESSORS_HPP
 #define CONSOLE_PROCESSORS_HPP
 
 #include "ConsoleHelpers.hpp"

@@ -11,9 +11,19 @@ class CommandManager
 public:
 	CommandManager()
 	{
+		// Generic
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuRestartCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, HelpCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ExitCommand>>());
+
+		// Guild
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildCreateCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildDifficultyCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildRenameCommand>>());
+
+		// Fallback, should be kept last while we keep them in the list
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ErrorCommand>>());
 	}
 
@@ -33,42 +43,27 @@ private:
 class GameManager
 {
 public:
-	const inline bool can_continue() const { return true; }
-
 	void force_menu()
 	{
 		std::vector<std::string> body  { "menu" };
 		auto menu = command_manager.create_command(body);
-		ConsoleProcessors::clean_and_print(menu->execute());
+		ConsoleProcessors::clean_and_print(menu->execute(game_data));
 	}
 	
 	void run_game()
 	{
-		while (can_continue())
+		while (!game_data.game_state.is_exit_requested())
 		{
 			auto cmd = ConsoleProcessors::get_next_command();
 			ConsoleProcessors::print_debug(cmd);
 			auto cmd_cmd = command_manager.create_command(cmd);
-			auto rs = cmd_cmd->execute();
+			auto rs = cmd_cmd->execute(game_data);
 			ConsoleProcessors::print_interface(rs);
 		}
-
-
-
-
-
-		
-		//auto creators = generic_creator<ICommand, IHelpCommand>();
-		//generic_creator<ICommand, IHelpCommand>* pointer = &creators;
-		//creator<ICommand>* ptr = pointer;
-
-		//bool std = ptr->is_createable_from("null");
-		//std::cout << std;
-
-
 	}
 private:
 	CommandManager command_manager;
+	GameData game_data;
 };
 
 #endif

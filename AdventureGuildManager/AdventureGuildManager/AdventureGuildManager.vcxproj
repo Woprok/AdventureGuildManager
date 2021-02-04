@@ -23,7 +23,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Command.hpp" />
+    <ClInclude Include="Headers\Commands.hpp" />
+    <ClInclude Include="Headers\ConsoleHelpers.hpp" />
+    <ClInclude Include="Headers\ConsoleProcessors.hpp" />
+    <ClInclude Include="Headers\GameEntities.hpp" />
     <ClInclude Include="Headers\GameManagers.hpp" />
+    <ClInclude Include="Headers\Interfaces.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
