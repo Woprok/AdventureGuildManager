@@ -11,7 +11,7 @@ public:
 	/// </summary>
 	static inline std::vector<std::string> get_next_command()
 	{
-		return ConsoleHelpers::split_string(ConsoleHelpers::read_single_command(), ' ');
+		return ConsoleHelpers::split_string(ConsoleHelpers::read_normalized_line(), ' ');
 	}
 	/// <summary>
 	/// This might need more work as there is no standard way how to do it correctly on each platform.

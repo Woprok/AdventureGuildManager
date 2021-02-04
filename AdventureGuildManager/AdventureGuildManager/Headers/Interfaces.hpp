@@ -22,7 +22,7 @@ class HelpInterface : public IDisplayeableInterface
 public:
 	std::string to_string() override
 	{
-		return "Help!\n Following commands are allowed: help, exit, guild.\n";
+		return "Help!\n Following commands are allowed: menu, help, exit, guild.\n";
 	}
 };
 
@@ -41,6 +41,13 @@ public:
 	std::string to_string() override
 	{
 		return "Invalid Command!\n";
+	}
+	std::string to_string(std::vector<std::string>& command)
+	{
+		std::string result = "";
+		for (auto&& body : command)
+			result += "[" + body + "] ";
+		return "Following command is not recognized: " + result + "\n";
 	}
 };
 

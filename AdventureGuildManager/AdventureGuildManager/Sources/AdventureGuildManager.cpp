@@ -5,12 +5,21 @@
 #include <utility>
 #include <vector>
 #include <sstream>
+#include <string_view>
 
-#include "../Headers/Commands.hpp"
+#include "../Headers/GameManagers.hpp"
 
-
-
-
+/// <summary>
+/// Call's game manager and that's it.
+/// </summary>
+int main()
+{
+	GameManager game_manager;
+	game_manager.force_menu();
+	game_manager.run_game();
+	return 0;
+}
+/*
 class Adventurer
 {
 public:
@@ -240,35 +249,4 @@ private:
 	GameState game_state;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int main()
-{
-	//auto creators = generic_creator<ICommand, IHelpCommand>();
-	//generic_creator<ICommand, IHelpCommand>* pointer = &creators;
-	//creator<ICommand>* ptr = pointer;
-	
-	//bool std = ptr->is_createable_from("null");
-	//std::cout << std;
-
-
-	
-	GameInstance game_instance;
-	game_instance.run_game();
-
-	return 0;
-}
+*/
