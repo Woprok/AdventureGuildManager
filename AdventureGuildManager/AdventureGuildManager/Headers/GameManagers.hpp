@@ -27,11 +27,13 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerAvailableCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerHiredCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerRecruitCommand>>());
 		
 		// Quest
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestAvailableCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestAcceptedCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestTakeCommand>>());
 
 		// Fallback, should be kept last while we keep them in the list
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ErrorCommand>>());

@@ -3,6 +3,10 @@
 
 #include <string>
 #include <vector>
+#include <sstream>
+
+#include "ConsoleProcessors.hpp"
+#include "ConsoleHelpers.hpp"
 #include "GameEntities.hpp"
 
 class IDisplayeableInterface
@@ -60,10 +64,12 @@ public:
 	}
 	std::string to_string(std::vector<std::string>& command)
 	{
-		std::string result;
+		std::ostringstream result;
+		result << "Following command is not recognized: ";
 		for (auto&& body : command)
-			result += "[" + body + "] ";
-		return "Following command is not recognized: " + result + "\n";
+			result << "[" << body << "] ";
+		result << "\n";
+		return result.str();
 	}
 };
 
@@ -76,12 +82,14 @@ public:
 	}
 	std::string to_string(Guild& guild)
 	{
-		return "Guild information's!\n" + guild.get_name() + "-->"
-			+ "[NAME:" + guild.get_name() + "]"
-			+ "[DIFF:" + std::to_string(guild.get_diff()) + "]"
-			+ "[FAME:" + std::to_string(guild.get_fame()) + "]"
-			+ "[GOLD:" + std::to_string(guild.get_gold()) + "]"
-			+ "\n";
+		std::ostringstream result;
+		result << "Guild information's!\n" 
+			<< "[NAME:" << guild.get_name() << "]"
+			<< "[DIFF:" << guild.get_diff() << "]"
+			<< "[FAME:" << guild.get_fame() << "]"
+			<< "[GOLD:" << guild.get_gold() << "]"
+			<< "\n";
+		return result.str();
 	}
 
 	std::string game_in_progress()
@@ -99,22 +107,29 @@ public:
 	}
 	std::string show_available(AdventurerKeeper& adventurer_keeper)
 	{
-		std::string result = "Available adventurers:\n";
-		for (auto && adventurer : adventurer_keeper.get_available())
+		std::ostringstream result;
+		result << "Available adventurers:\n";
+		for (auto&& adventurer : adventurer_keeper.get_available())
 		{
-			result += adventurer->get_name() + "\n";
+			result << adventurer->get_id() << "::" << adventurer->get_name() << "\n";
 		}
-		return result;
+		return result.str();
 	}
 
 	std::string show_hired(AdventurerKeeper& adventurer_keeper)
 	{
-		std::string result = "Hired adventurers:\n";
+		std::ostringstream result;
+		result << "Hired adventurers:\n";
 		for (auto&& adventurer : adventurer_keeper.get_hired())
 		{
-			result += adventurer->get_name() + "\n";
+			result << adventurer->get_id() << "::" << adventurer->get_name() << "\n";
 		}
-		return result;
+		return result.str();
+	}
+
+	std::string not_available()
+	{
+		return "Adventurer is not available to recruit.\n";
 	}
 };
 
@@ -127,22 +142,73 @@ public:
 	}
 	std::string show_available(QuestKeeper& quest_keeper)
 	{
-		std::string result = "Available quests:\n";
-		for (auto&& adventurer : quest_keeper.get_available())
+		std::ostringstream result;
+		result << "Available quests:\n";
+		for (auto&& quest : quest_keeper.get_available())
 		{
-			result += adventurer->get_name() + "\n";
+			result << quest->get_id() << "::" << quest->get_name() << "\n";
 		}
-		return result;
+		return result.str();
+
 	}
 
 	std::string show_accepted(QuestKeeper& quest_keeper)
 	{
-		std::string result = "Accepted quests:\n";
-		for (auto&& adventurer : quest_keeper.get_accepted())
+		std::ostringstream result;
+		result << "Accepted quests:\n";
+		for (auto&& quest : quest_keeper.get_accepted())
 		{
-			result += adventurer->get_name() + "\n";
+			result << quest->get_id() << "::" << quest->get_name() << "\n";
 		}
-		return result;
+		return result.str();
+	}
+	
+	std::string not_available()
+	{
+		return "Quest is not available for taking.\n";
+	}
+};
+
+/// <summary>
+/// Set of interfaces for additional input's
+/// </summary>
+class InputInterface : public IDisplayeableInterface
+{
+public:
+	static std::string get_name()
+	{
+		ConsoleProcessors::print_interface("Enter a new name: ");
+		return ConsoleHelpers::read_line();
+	}
+	static int get_id(std::string&& possible_id)
+	{
+		int id = -1;
+		if (!possible_id.empty())
+		{
+			try
+			{
+				id = std::stoi(possible_id);
+			}
+			catch (...)
+			{
+				ConsoleProcessors::print_interface("Last argument is not a proper id.\n");
+				id = -1;
+			}
+		}
+		while (id <= -1)
+		{
+			ConsoleProcessors::print_interface("Enter a id: ");
+			try
+			{
+				id = std::stoi(ConsoleHelpers::read_line());
+			}
+			catch (...)
+			{
+				ConsoleProcessors::print_interface("Not a proper id.\n");
+				id = -1;
+			}
+		}
+		return id;
 	}
 };
 #endif

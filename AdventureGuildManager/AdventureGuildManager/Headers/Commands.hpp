@@ -198,7 +198,11 @@ public:
 			name = std::accumulate(context.begin() + 2, context.end(), name,
 				[](std::string a, std::string b) { return a + " " + b; });
 		}
-		
+		else
+		{
+			name = InputInterface::get_name();
+		}
+
 		game_data.rename_guild(name);
 		return interface.to_string(game_data.current_guild);
 	}
@@ -280,6 +284,30 @@ private:
 	AdventurerInterface interface;
 };
 
+class AdventurerRecruitCommand : public ICommand
+{
+public:
+	AdventurerRecruitCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() >= 2
+			&& command_context[0] == "adventurer"
+			&& command_context[1] == "recruit";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		
+		if (!game_data.adventurers.recruit(id))
+		{
+			return interface.not_available();
+		}
+		
+		return interface.show_hired(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
 
 class QuestCommand : public ICommand
 {
@@ -330,6 +358,31 @@ public:
 	}
 	std::string execute(GameData& game_data) override
 	{
+		return interface.show_accepted(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
+
+class QuestTakeCommand : public ICommand
+{
+public:
+	QuestTakeCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() >= 2
+			&& command_context[0] == "quest"
+			&& command_context[1] == "take";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+
+		if (!game_data.quests.take(id))
+		{
+			return interface.not_available();
+		}
+
 		return interface.show_accepted(game_data.quests);
 	}
 private:

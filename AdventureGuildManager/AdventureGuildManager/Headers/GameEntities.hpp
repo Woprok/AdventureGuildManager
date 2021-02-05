@@ -8,11 +8,14 @@
 class NamedEntity
 {
 public:
-	NamedEntity(std::string entity_name) : name(entity_name) {}
+	NamedEntity(std::string entity_name) : name(entity_name), id(last_id++) {}
 	std::string get_name() const { return name; }
 	std::string set_name(std::string value) { name = value; return name; }
+	int get_id() const { return id; }
 protected:
 	std::string name = "Entity";
+	int id;
+	inline static int last_id = 0;
 };
 
 class Adventurer : public NamedEntity
@@ -42,6 +45,21 @@ public:
 		available.clear();
 		hired.clear();
 	}
+	bool recruit(int adventurer_id)
+	{
+		const auto it = std::find_if(available.begin(), available.end(), 
+			[adventurer_id](auto&& adv)
+			{
+				return adv->get_id() == adventurer_id;
+			});
+		if (it != available.end())
+		{
+			hired.push_back(std::move(*it));
+			available.erase(it);
+			return true;
+		}
+		return false;
+	}
 	const std::vector<std::unique_ptr<Adventurer>>& get_hired() { return hired; }
 	const std::vector<std::unique_ptr<Adventurer>>& get_available() { return available; }
 private:
@@ -64,6 +82,21 @@ public:
 	{
 		available.clear();
 		accepted.clear();
+	}
+	bool take(int quest_id)
+	{
+		const auto it = std::find_if(available.begin(), available.end(),
+			[quest_id](auto&& adv)
+			{
+				return adv->get_id() == quest_id;
+			});
+		if (it != available.end())
+		{
+			accepted.push_back(std::move(*it));
+			available.erase(it);
+			return true;
+		}
+		return false;
 	}
 	const std::vector<std::unique_ptr<Quest>>& get_accepted() { return accepted; }
 	const std::vector<std::unique_ptr<Quest>>& get_available() { return available; }
@@ -146,10 +179,6 @@ public:
 	}
 	inline void rename_guild(std::string new_name)
 	{
-		if (new_name.empty())
-		{
-			new_name = ConsoleHelpers::read_line();
-		}
 		current_guild.set_name(new_name);
 	}
 private:
