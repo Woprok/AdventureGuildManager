@@ -90,5 +90,59 @@ public:
 	}
 };
 
+class AdventurerInterface : public IDisplayeableInterface
+{
+public:
+	std::string to_string() override
+	{
+		return "Welcome to public relations guild!\n";
+	}
+	std::string show_available(AdventurerKeeper& adventurer_keeper)
+	{
+		std::string result = "Available adventurers:\n";
+		for (auto && adventurer : adventurer_keeper.get_available())
+		{
+			result += adventurer->get_name() + "\n";
+		}
+		return result;
+	}
 
+	std::string show_hired(AdventurerKeeper& adventurer_keeper)
+	{
+		std::string result = "Hired adventurers:\n";
+		for (auto&& adventurer : adventurer_keeper.get_hired())
+		{
+			result += adventurer->get_name() + "\n";
+		}
+		return result;
+	}
+};
+
+class QuestInterface : public IDisplayeableInterface
+{
+public:
+	std::string to_string() override
+	{
+		return "Welcome to Quest board association!\n";
+	}
+	std::string show_available(QuestKeeper& quest_keeper)
+	{
+		std::string result = "Available quests:\n";
+		for (auto&& adventurer : quest_keeper.get_available())
+		{
+			result += adventurer->get_name() + "\n";
+		}
+		return result;
+	}
+
+	std::string show_accepted(QuestKeeper& quest_keeper)
+	{
+		std::string result = "Accepted quests:\n";
+		for (auto&& adventurer : quest_keeper.get_accepted())
+		{
+			result += adventurer->get_name() + "\n";
+		}
+		return result;
+	}
+};
 #endif

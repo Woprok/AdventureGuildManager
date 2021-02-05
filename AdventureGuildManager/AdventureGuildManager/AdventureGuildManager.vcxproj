@@ -28,6 +28,7 @@
     <ClInclude Include="Headers\ConsoleProcessors.hpp" />
     <ClInclude Include="Headers\GameEntities.hpp" />
     <ClInclude Include="Headers\GameManagers.hpp" />
+    <ClInclude Include="Headers\Generators.hpp" />
     <ClInclude Include="Headers\Interfaces.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

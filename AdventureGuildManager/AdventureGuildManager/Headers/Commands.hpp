@@ -224,5 +224,116 @@ private:
 	GuildInterface interface;
 };
 
+
+class AdventurerCommand : public ICommand
+{
+public:
+	AdventurerCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 1
+			&& command_context[0] == "adventurer";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.to_string();
+	}
+private:
+	AdventurerInterface interface;
+};
+
+
+class AdventurerAvailableCommand : public ICommand
+{
+public:
+	AdventurerAvailableCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& command_context[0] == "adventurer"
+			&& command_context[1] == "available";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_available(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
+
+
+class AdventurerHiredCommand : public ICommand
+{
+public:
+	AdventurerHiredCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& command_context[0] == "adventurer"
+			&& command_context[1] == "hired";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_hired(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
+
+
+class QuestCommand : public ICommand
+{
+public:
+	QuestCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 1
+			&& command_context[0] == "quest";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.to_string();
+	}
+private:
+	QuestInterface interface;
+};
+
+
+class QuestAvailableCommand : public ICommand
+{
+public:
+	QuestAvailableCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& command_context[0] == "quest"
+			&& command_context[1] == "available";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_available(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
+
+
+class QuestAcceptedCommand : public ICommand
+{
+public:
+	QuestAcceptedCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& command_context[0] == "quest"
+			&& command_context[1] == "accepted";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_accepted(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
 #pragma endregion
 #endif

@@ -41,5 +41,8 @@
     <ClInclude Include="Headers\Interfaces.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Generators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
