@@ -1,13 +1,13 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <numeric>
+#include <random>
+#include <sstream>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
-#include <sstream>
-#include <string_view>
-#include <random>
-#include <numeric>
 
 #include "../Headers/GameManagers.hpp"
 #include "../Headers/Generators.hpp"

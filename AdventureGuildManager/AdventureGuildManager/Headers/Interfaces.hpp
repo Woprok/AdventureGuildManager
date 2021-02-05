@@ -146,26 +146,47 @@ public:
 		result << "Available quests:\n";
 		for (auto&& quest : quest_keeper.get_available())
 		{
-			result << quest->get_id() << "::" << quest->get_name() << "\n";
+			result << quest_detail(*quest);
 		}
 		return result.str();
 
 	}
 
-	std::string show_accepted(QuestKeeper& quest_keeper)
+	std::string show_reserved(QuestKeeper& quest_keeper)
 	{
 		std::ostringstream result;
-		result << "Accepted quests:\n";
-		for (auto&& quest : quest_keeper.get_accepted())
+		result << "Reserved quests:\n";
+		for (auto&& quest : quest_keeper.get_reserved())
 		{
-			result << quest->get_id() << "::" << quest->get_name() << "\n";
+			result << quest_detail(*quest);
+		}
+		return result.str();
+	}
+
+	std::string show_completed(QuestKeeper& quest_keeper)
+	{
+		std::ostringstream result;
+		result << "Completed quests:\n";
+		for (auto&& quest : quest_keeper.get_completed())
+		{
+			result << quest_detail(*quest);
 		}
 		return result.str();
 	}
 	
 	std::string not_available()
 	{
-		return "Quest is not available for taking.\n";
+		return "Quest is not available or does not exist.\n";
+	}
+public:
+	std::string quest_detail(const Quest& quest)
+	{
+		std::ostringstream result;
+		result << quest.get_id() << "::" << quest.get_name() << "->"
+			<< "[FAME:" << quest.get_fame() << "]"
+			<< "[GOLD:" << quest.get_gold() << "]"
+			<< "\n";
+		return result.str();
 	}
 };
 

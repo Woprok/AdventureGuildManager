@@ -61,7 +61,8 @@ public:
 
 	static bool can_derive_from(string_context& command_context)
 	{
-		return command_context.size() == 1 && command_context[0] == "menu";
+		return command_context.size() == 1
+			&& command_context[0] == "menu";
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -81,8 +82,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-		&& command_context[0] == "menu"
-		&& command_context[1] == "restart";
+			&& command_context[0] == "menu"
+			&& command_context[1] == "restart";
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -103,7 +104,8 @@ public:
 	HelpCommand(string_context& command_context) : ICommand(command_context) { }
 	static bool can_derive_from(string_context& command_context)
 	{
-		return command_context.size() == 1 && command_context[0] == "help";
+		return command_context.size() == 1
+			&& command_context[0] == "help";
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -119,7 +121,8 @@ public:
 	ExitCommand(string_context& command_context) : ICommand(command_context) { }
 	static bool can_derive_from(string_context& command_context)
 	{
-		return command_context.size() == 1 && command_context[0] == "exit";
+		return command_context.size() == 1
+			&& command_context[0] == "exit";
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -149,11 +152,29 @@ public:
 	GuildCommand(string_context& command_context) : ICommand(command_context) { }
 	static bool can_derive_from(string_context& command_context)
 	{
-		return command_context.size() == 1 && command_context[0] == "guild";
+		return command_context.size() == 1 && (command_context[0] == "guild" || command_context[0] == "g");
 	}
 	std::string execute(GameData& game_data) override
 	{
 		return interface.to_string();
+	}
+private:
+	GuildInterface interface;
+};
+
+class GuildInfoCommand : public ICommand
+{
+public:
+	GuildInfoCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& (command_context[0] == "guild" || command_context[0] == "g")
+			&& (command_context[1] == "info" || command_context[1] == "-i");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.to_string(game_data.current_guild);
 	}
 private:
 	GuildInterface interface;
@@ -166,8 +187,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "guild"
-			&& command_context[1] == "create";
+			&& (command_context[0] == "guild" || command_context[0] == "g")
+			&& (command_context[1] == "create" || command_context[1] == "-c");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -187,8 +208,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
-			&& command_context[0] == "guild"
-			&& command_context[1] == "rename";
+			&& (command_context[0] == "guild" || command_context[0] == "g")
+			&& (command_context[1] == "rename" || command_context[1] == "-r");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -217,8 +238,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "guild"
-			&& command_context[1] == "difficulty";
+			&& (command_context[0] == "guild" || command_context[0] == "g")
+			&& (command_context[1] == "difficulty" || command_context[1] == "-d");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -236,7 +257,7 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 1
-			&& command_context[0] == "adventurer";
+			&& (command_context[0] == "adventurer" || command_context[0] == "a");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -254,8 +275,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "adventurer"
-			&& command_context[1] == "available";
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "available" || command_context[1] == "-a");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -273,8 +294,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "adventurer"
-			&& command_context[1] == "hired";
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "hired" || command_context[1] == "-h");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -291,8 +312,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
-			&& command_context[0] == "adventurer"
-			&& command_context[1] == "recruit";
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "recruit" || command_context[1] == "-r");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -316,7 +337,7 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 1
-			&& command_context[0] == "quest";
+			&& (command_context[0] == "quest" || command_context[0] == "q");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -334,8 +355,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "quest"
-			&& command_context[1] == "available";
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "available" || command_context[1] == "-a");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -346,19 +367,37 @@ private:
 };
 
 
-class QuestAcceptedCommand : public ICommand
+class QuestReserverCommand : public ICommand
 {
 public:
-	QuestAcceptedCommand(string_context& command_context) : ICommand(command_context) { }
+	QuestReserverCommand(string_context& command_context) : ICommand(command_context) { }
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 2
-			&& command_context[0] == "quest"
-			&& command_context[1] == "accepted";
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "reserved" || command_context[1] == "-r");
 	}
 	std::string execute(GameData& game_data) override
 	{
-		return interface.show_accepted(game_data.quests);
+		return interface.show_reserved(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
+
+class QuestCompletedCommand : public ICommand
+{
+public:
+	QuestCompletedCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "completed" || command_context[1] == "-c");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_completed(game_data.quests);
 	}
 private:
 	QuestInterface interface;
@@ -371,8 +410,8 @@ public:
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
-			&& command_context[0] == "quest"
-			&& command_context[1] == "take";
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "take" || command_context[1] == "-t");
 	}
 	std::string execute(GameData& game_data) override
 	{
@@ -383,7 +422,32 @@ public:
 			return interface.not_available();
 		}
 
-		return interface.show_accepted(game_data.quests);
+		return interface.show_reserved(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
+
+class QuestDispatchCommand : public ICommand
+{
+public:
+	QuestDispatchCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() >= 2
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "dispatch" || command_context[1] == "-d");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		int adventurer_id = InputInterface::get_id(context.size() >= 3 ? context[2] : "");
+		int quest_id = InputInterface::get_id(context.size() >= 4 ? context[3] : "");
+		if (!game_data.dispatch(adventurer_id, quest_id))
+		{
+			return interface.not_available();
+		}
+
+		return interface.show_completed(game_data.quests);
 	}
 private:
 	QuestInterface interface;

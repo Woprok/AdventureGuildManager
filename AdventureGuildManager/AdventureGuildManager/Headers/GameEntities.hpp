@@ -28,6 +28,52 @@ class Quest : public NamedEntity
 {
 public:
 	Quest(std::string quest_name) : NamedEntity(quest_name) {}
+	int get_gold() const { return gold; }
+	int set_gold(int value) { gold = value; return gold; }
+	int get_fame() const { return fame; }
+	int set_fame(int value) { fame = value; return fame; }
+private:
+	int gold = 0;
+	int fame = 0;
+};
+
+typedef std::vector<std::unique_ptr<Adventurer>> adventurer_collection;
+typedef std::vector<std::unique_ptr<Quest>> quest_collection;
+
+class CollectionIterators
+{
+public:
+	template<class T>
+	static bool transfer(std::vector<std::unique_ptr<T>>& source, std::vector<std::unique_ptr<T>>& destination, int id)
+	{
+		const auto it = std::find_if(source.begin(), source.end(),
+			[id](auto&& item)
+			{
+				return item->get_id() == id;
+			});
+		if (it != source.end())
+		{
+			destination.push_back(std::move(*it));
+			source.erase(it);
+			return true;
+		}
+		return false;
+	}
+
+	template<class T>
+	static T* find(const std::vector<std::unique_ptr<T>>& source, int id)
+	{
+		const auto it = std::find_if(source.begin(), source.end(),
+			[id](auto&& item)
+			{
+				return item->get_id() == id;
+			});
+		if (it != source.end())
+		{
+			return it->get();
+		}
+		return nullptr;
+	}
 };
 
 class AdventurerKeeper
@@ -47,62 +93,55 @@ public:
 	}
 	bool recruit(int adventurer_id)
 	{
-		const auto it = std::find_if(available.begin(), available.end(), 
-			[adventurer_id](auto&& adv)
-			{
-				return adv->get_id() == adventurer_id;
-			});
-		if (it != available.end())
-		{
-			hired.push_back(std::move(*it));
-			available.erase(it);
-			return true;
-		}
-		return false;
+		return CollectionIterators::transfer(available, hired, adventurer_id);
 	}
-	const std::vector<std::unique_ptr<Adventurer>>& get_hired() { return hired; }
-	const std::vector<std::unique_ptr<Adventurer>>& get_available() { return available; }
+	const adventurer_collection& get_hired() { return hired; }
+	const adventurer_collection& get_available() { return available; }
 private:
-	std::vector<std::unique_ptr<Adventurer>> available;
-	std::vector<std::unique_ptr<Adventurer>> hired;
+	adventurer_collection available;
+	adventurer_collection hired;
 	NameGenerator name_generator;
 };
 
 class QuestKeeper
 {
 public:
+	std::unique_ptr<Quest> create_quest()
+	{
+		auto&& quest = std::make_unique<Quest>(name_generator.create_quest_name());
+		quest->set_gold(100);
+		quest->set_fame(10);
+		return std::move(quest);
+	}
 	void generate(int count)
 	{
 		for (int i = 0; i < count; ++i)
 		{
-			available.push_back(std::make_unique<Quest>(name_generator.create_quest_name()));
+			available.push_back(create_quest());
 		}
 	}
 	void clear()
 	{
 		available.clear();
-		accepted.clear();
+		reserved.clear();
+		completed.clear();
 	}
 	bool take(int quest_id)
 	{
-		const auto it = std::find_if(available.begin(), available.end(),
-			[quest_id](auto&& adv)
-			{
-				return adv->get_id() == quest_id;
-			});
-		if (it != available.end())
-		{
-			accepted.push_back(std::move(*it));
-			available.erase(it);
-			return true;
-		}
-		return false;
+		return CollectionIterators::transfer(available, reserved, quest_id);
 	}
-	const std::vector<std::unique_ptr<Quest>>& get_accepted() { return accepted; }
-	const std::vector<std::unique_ptr<Quest>>& get_available() { return available; }
+	bool complete(int quest_id)
+	{
+		return CollectionIterators::transfer(reserved, completed, quest_id);
+	}
+
+	const quest_collection& get_available() { return available; }
+	const quest_collection& get_reserved() { return reserved; }
+	const quest_collection& get_completed() { return completed; }
 private:
-	std::vector<std::unique_ptr<Quest>> available;
-	std::vector<std::unique_ptr<Quest>> accepted;
+	quest_collection available;
+	quest_collection reserved;
+	quest_collection completed;
 	NameGenerator name_generator;
 };
 
@@ -112,8 +151,10 @@ public:
 	Guild() : NamedEntity("My Guild") {}
 	int get_gold() const { return gold; }
 	int set_gold(int value) { gold = value; return gold; }
+	int add_gold(int value) { gold += value; return gold; }
 	int get_fame() const { return fame; }
 	int set_fame(int value) { fame = value; return fame; }
+	int add_fame(int value) { fame += value; return fame; }
 	int get_diff() const { return diff; }
 	int set_diff(int value) { diff = value; return diff; }
 	void clear()
@@ -180,6 +221,23 @@ public:
 	inline void rename_guild(std::string new_name)
 	{
 		current_guild.set_name(new_name);
+	}
+	inline bool dispatch(int adventurer_id, int quest_id)
+	{
+		const auto adventurer = CollectionIterators::find(adventurers.get_hired(), adventurer_id);
+		const auto quest = CollectionIterators::find(quests.get_reserved(), quest_id);
+		if (adventurer != nullptr && quest != nullptr)
+		{
+			current_guild.add_gold(quest->get_gold());
+			current_guild.add_fame(quest->get_fame());
+			
+			quests.complete(quest_id);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 private:
 };
