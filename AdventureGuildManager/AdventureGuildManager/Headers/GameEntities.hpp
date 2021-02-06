@@ -27,14 +27,18 @@ protected:
 	inline static int last_id = 0;
 };
 
+class Adventurer;
+class Quest;
+class Skill;
+
 class Adventurer : public NamedEntity
 {
 public:
 	Adventurer(std::string adventurer_name) : NamedEntity(adventurer_name) {}
 	std::unordered_set<int>& get_succ_quest_ids() { return succ_quest_ids; }
-	std::unordered_set<int>& set_succ_quest_id(int value) { succ_quest_ids.emplace(value); return succ_quest_ids; }
+	std::unordered_set<int>& set_succ_quest_id(int value) { succ_quest_ids.insert(value); return succ_quest_ids; }
 	std::unordered_set<int>& get_fail_quest_ids() { return fail_quest_ids; }
-	std::unordered_set<int>& set_fail_quest_id(int value) { fail_quest_ids.emplace(value); return fail_quest_ids; }
+	std::unordered_set<int>& set_fail_quest_id(int value) { fail_quest_ids.insert(value); return fail_quest_ids; }
 	int get_recruitment_cost() const { return recruitment_cost; }
 	int set_recruitment_cost(int value) { recruitment_cost = value; return recruitment_cost; }
 	int get_retirement_cost() const { return retirement_cost; }
@@ -57,6 +61,24 @@ private:
 	int retirement_cost = 0;
 	int living_expenses = 0;
 	int experience = 0;
+};
+
+enum class QuestType
+{
+	Minions,
+	Boss,
+	Poison,
+	Bleeding,
+	Curse,
+	Elfs,
+	Dwarfs,
+	Fairies,
+	Magical,
+	Darkness,
+	Wilderness,
+	Dankness,
+	Memes,
+	Mimes,
 };
 
 class Reward
@@ -98,12 +120,174 @@ public:
 	QuestStateEnum set_state(QuestStateEnum value) { state = value; return state; }
 	int get_difficulty() const { return difficulty; }
 	int set_difficulty(int value) { difficulty = std::clamp(value, 1, 10); return difficulty; }
+	std::unordered_set<QuestType>& get_quest_types() { return types; }
+	std::unordered_set<QuestType>& set_quest_types(QuestType value) { types.insert(value); return types; }
+	bool has_quest_type(QuestType value) { return types.contains(value); }
 private:
 	Reward reward;
 	Penalty penalty;
 	QuestStateEnum state = QuestStateEnum::Undefined;
 	int adventurer_id = - 1;
 	int difficulty = 1;
+	std::unordered_set<QuestType> types;
+};
+
+class Skill : NamedEntity
+{
+public:
+	Skill(std::string skill_name) : NamedEntity(skill_name) {}
+	virtual void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) = 0;
+};
+
+class Hoarder : Skill
+{
+public:
+	Hoarder() : Skill("Hoarder") {}
+	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
+	{
+		reward.set_gold(reward.get_gold() * 1.2);
+	}
+};
+class EscapeArtist : Skill
+{
+public:
+	EscapeArtist() : Skill("EscapeArtist") {}
+	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
+	{
+		ChanceGenerator chance;
+		penalty.set_deadly(penalty.get_deadly() && chance.get_chance() <= 75);
+	}
+};
+class MisterHandsome : Skill
+{
+public:
+	MisterHandsome() : Skill("MisterHandsome") {}
+	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
+	{
+		reward.set_fame(reward.get_fame() * 2.0);
+	}
+};
+class PerfectHero : Skill
+{
+public:
+	PerfectHero() : Skill("PerfectHero") {}
+	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
+	{
+		penalty.set_gold(0);
+		penalty.set_fame(0);
+		penalty.set_deadly(false);
+	}
+};
+
+class CounterSkill : Skill
+{
+public:
+	CounterSkill(std::string value) : Skill(value) {}
+	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
+	{
+		ChanceGenerator chance;
+		if (quest.has_quest_type(get_counter()))
+		{
+			result = result || chance.get_chance() > 75;
+		}
+	}
+	virtual QuestType get_counter() = 0;
+};
+class Cleave : CounterSkill
+{
+public:
+	Cleave() : CounterSkill("Cleave") {}
+	QuestType get_counter() override { return QuestType::Minions; }
+};
+class Assassin : CounterSkill
+{
+public:
+	Assassin() : CounterSkill("Assassin") {}
+	QuestType get_counter() override { return QuestType::Boss; }
+};
+class Mage : CounterSkill
+{
+public:
+	Mage() : CounterSkill("Mage") {}
+	QuestType get_counter() override { return QuestType::Magical; }
+};
+class Healer : CounterSkill
+{
+public:
+	Healer() : CounterSkill("Healer") {}
+	QuestType get_counter() override { return QuestType::Bleeding; }
+};
+class Paladin : CounterSkill
+{
+public:
+	Paladin() : CounterSkill("Paladin") {}
+	QuestType get_counter() override { return QuestType::Curse; }
+};
+class Shaman : CounterSkill
+{
+public:
+	Shaman() : CounterSkill("Shaman") {}
+	QuestType get_counter() override { return QuestType::Poison; }
+};
+class Fighter : CounterSkill
+{
+public:
+	Fighter() : CounterSkill("Fighter") {}
+	QuestType get_counter() override { return QuestType::Boss; }
+};
+class Lightbearer : CounterSkill
+{
+public:
+	Lightbearer() : CounterSkill("Lightbearer") {}
+	QuestType get_counter() override { return QuestType::Darkness; }
+};
+class SurvivalExpert : CounterSkill
+{
+public:
+	SurvivalExpert() : CounterSkill("SurvivalExpert") {}
+	QuestType get_counter() override { return QuestType::Wilderness; }
+};
+class Woodcutter : CounterSkill
+{
+public:
+	Woodcutter() : CounterSkill("Woodcutter") {}
+	QuestType get_counter() override { return QuestType::Elfs; }
+};
+class Digger : CounterSkill
+{
+public:
+	Digger() : CounterSkill("Digger") {}
+	QuestType get_counter() override { return QuestType::Dwarfs; }
+};
+class Pyromaniac : CounterSkill
+{
+public:
+	Pyromaniac() : CounterSkill("Pyromaniac") {}
+	QuestType get_counter() override { return QuestType::Elfs; }
+};
+class Bard : CounterSkill
+{
+public:
+	Bard() : CounterSkill("Bard") {}
+	QuestType get_counter() override { return QuestType::Memes; }
+};
+class Troll : CounterSkill
+{
+public:
+	Troll() : CounterSkill("Troll") {}
+	QuestType get_counter() override { return QuestType::Dankness; }
+};
+class Warlock : CounterSkill
+{
+public:
+	Warlock() : CounterSkill("Warlock") {}
+	QuestType get_counter() override { return QuestType::Fairies; }
+};
+class Clown : CounterSkill
+{
+public:
+	Clown() : CounterSkill("Clown") {}
+	QuestType get_counter() override { return QuestType::Mimes; }
 };
 
 typedef std::vector<std::unique_ptr<Adventurer>> adventurer_collection;
@@ -205,6 +389,9 @@ public:
 		quest->get_penalty().set_gold(100);
 		quest->get_penalty().set_fame(10);
 		quest->set_difficulty(2);
+		quest->set_quest_types(QuestType::Boss);
+		quest->set_quest_types(QuestType::Minions);
+		quest->set_quest_types(QuestType::Elfs);
 		return std::move(quest);
 	}
 	void generate(int count)
@@ -374,7 +561,6 @@ public:
 			for (int i = 0; i < level - diff + 1 && final_result == false; ++i)
 			{
 				final_result = calculate_success(chance_generator.get_chance(), base);
-				std::cout << i << final_result << std::endl;
 			}
 		}
 		else if (level - diff < 0) // 1:x is disadvantage, first fail is result
@@ -383,7 +569,6 @@ public:
 			for (int i = 0; i < diff - level + 1 && final_result == true; ++i)
 			{
 				final_result = calculate_success(chance_generator.get_chance(), base);
-				std::cout << i << final_result << std::endl;
 			}
 		}
 		else // 1:1, base roll is returned
@@ -408,14 +593,19 @@ public:
 				compare_value = std::clamp(compare_value, 10ull, 90ull);
 			}
 			// Calculate result
-			const bool result = calculate_total_success(compare_value, adventurer->get_level(), quest->get_difficulty());
+			bool result = calculate_total_success(compare_value, adventurer->get_level(), quest->get_difficulty());
+
+			Reward quest_reward = quest->get_reward();
+			Penalty quest_penalty = quest->get_penalty();
+			auto&& skill = std::make_unique<Hoarder>();
+			skill->execute_skill(result, *quest, *adventurer, quest_reward, quest_penalty);
 			
 			// Finish valuation of quest
 			if (result)
 			{
 				// Get Reward
-				current_guild.add_gold(quest->get_reward().get_gold());
-				current_guild.add_fame(quest->get_reward().get_fame());
+				current_guild.add_gold(quest_reward.get_gold());
+				current_guild.add_fame(quest_reward.get_fame());
 				// Update experience
 				adventurer->add_experience(calculate_experience(quest->get_difficulty(), adventurer->get_level()));
 				
@@ -429,9 +619,9 @@ public:
 			else
 			{
 				// Get Penalty
-				current_guild.rmv_gold(quest->get_penalty().get_gold());
-				current_guild.rmv_fame(quest->get_penalty().get_fame());
-				if (quest->get_penalty().get_deadly())
+				current_guild.rmv_gold(quest_penalty.get_gold());
+				current_guild.rmv_fame(quest_penalty.get_fame());
+				if (quest_penalty.get_deadly())
 				{
 					// Just kill, no exp obtained sorry bro.
 					adventurers.kill(adventurer_id);					
