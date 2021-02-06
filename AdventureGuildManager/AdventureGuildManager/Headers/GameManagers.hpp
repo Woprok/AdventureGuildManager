@@ -28,13 +28,19 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerAvailableCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerHiredCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerDeadCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerInactiveCommand>>());
+		// Adventurer Actions
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerRecruitCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerPensionCommand>>());
 		
 		// Quest
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestAvailableCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestReserverCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCompletedCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestFailedCommand>>());
+		// Quest Actions
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestTakeCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestDispatchCommand>>());
 

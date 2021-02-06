@@ -305,6 +305,42 @@ private:
 	AdventurerInterface interface;
 };
 
+class AdventurerDeadCommand : public ICommand
+{
+public:
+	AdventurerDeadCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "dead" || command_context[1] == "-d");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_dead(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
+
+class AdventurerInactiveCommand : public ICommand
+{
+public:
+	AdventurerInactiveCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "inactive" || command_context[1] == "-i");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_inactive(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
+
 class AdventurerRecruitCommand : public ICommand
 {
 public:
@@ -319,12 +355,37 @@ public:
 	{
 		int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
 		
-		if (!game_data.adventurers.recruit(id))
+		if (!game_data.recruit(id))
 		{
-			return interface.not_available();
+			return interface.not_available_recruit();
 		}
 		
 		return interface.show_hired(game_data.adventurers);
+	}
+private:
+	AdventurerInterface interface;
+};
+
+class AdventurerPensionCommand : public ICommand
+{
+public:
+	AdventurerPensionCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() >= 2
+			&& (command_context[0] == "adventurer" || command_context[0] == "a")
+			&& (command_context[1] == "pension" || command_context[1] == "-p");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+
+		if (!game_data.pension(id))
+		{
+			return interface.not_available_pension();
+		}
+
+		return interface.show_inactive(game_data.adventurers);
 	}
 private:
 	AdventurerInterface interface;
@@ -403,6 +464,24 @@ private:
 	QuestInterface interface;
 };
 
+class QuestFailedCommand : public ICommand
+{
+public:
+	QuestFailedCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 2
+			&& (command_context[0] == "quest" || command_context[0] == "q")
+			&& (command_context[1] == "failed" || command_context[1] == "-f");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		return interface.show_failed(game_data.quests);
+	}
+private:
+	QuestInterface interface;
+};
+
 class QuestTakeCommand : public ICommand
 {
 public:
@@ -415,7 +494,7 @@ public:
 	}
 	std::string execute(GameData& game_data) override
 	{
-		int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		const int id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
 
 		if (!game_data.quests.take(id))
 		{
@@ -440,14 +519,14 @@ public:
 	}
 	std::string execute(GameData& game_data) override
 	{
-		int adventurer_id = InputInterface::get_id(context.size() >= 3 ? context[2] : "");
-		int quest_id = InputInterface::get_id(context.size() >= 4 ? context[3] : "");
-		if (!game_data.dispatch(adventurer_id, quest_id))
-		{
-			return interface.not_available();
-		}
-
-		return interface.show_completed(game_data.quests);
+		const int adventurer_id = InputInterface::get_id(context.size() >= 3 ? context[2] : "");
+		const int quest_id = InputInterface::get_id(context.size() >= 4 ? context[3] : "");
+		auto&& result = game_data.dispatch(adventurer_id, quest_id);
+		if (result == QuestStateEnum::Success)
+			return interface.show_completed(game_data.quests);
+		if (result == QuestStateEnum::Failure)
+			return interface.show_failed(game_data.quests);
+		return interface.not_available();
 	}
 private:
 	QuestInterface interface;

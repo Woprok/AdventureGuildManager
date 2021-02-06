@@ -111,7 +111,7 @@ public:
 		result << "Available adventurers:\n";
 		for (auto&& adventurer : adventurer_keeper.get_available())
 		{
-			result << adventurer->get_id() << "::" << adventurer->get_name() << "\n";
+			result << adventurer_detail(*adventurer);
 		}
 		return result.str();
 	}
@@ -122,14 +122,71 @@ public:
 		result << "Hired adventurers:\n";
 		for (auto&& adventurer : adventurer_keeper.get_hired())
 		{
-			result << adventurer->get_id() << "::" << adventurer->get_name() << "\n";
+			result << adventurer_detail(*adventurer);
+		}
+		return result.str();
+	}
+	
+	std::string show_dead(AdventurerKeeper& adventurer_keeper)
+	{
+		std::ostringstream result;
+		result << "Dead adventurers:\n";
+		for (auto&& adventurer : adventurer_keeper.get_dead())
+		{
+			result << adventurer_detail(*adventurer);
+		}
+		return result.str();
+	}
+	
+	std::string show_inactive(AdventurerKeeper& adventurer_keeper)
+	{
+		std::ostringstream result;
+		result << "Inactive adventurers:\n";
+		for (auto&& adventurer : adventurer_keeper.get_inactive())
+		{
+			result << adventurer_detail(*adventurer);
 		}
 		return result.str();
 	}
 
-	std::string not_available()
+	std::string not_available_recruit()
 	{
-		return "Adventurer is not available to recruit.\n";
+		return "Adventurer is not available to recruit or you are missing necessary funds.\n";
+	}
+	std::string not_available_pension()
+	{
+		return "Adventurer is not available to inactivate or you are missing necessary funds.\n";
+	}
+private:
+	std::string adventurer_detail(Adventurer& adventurer)
+	{
+		std::string list_of_succ_quests;
+		list_of_succ_quests = std::accumulate(
+			adventurer.get_succ_quest_ids().begin(),
+			adventurer.get_succ_quest_ids().end(),
+			list_of_succ_quests,
+			[](std::string a, int b) { return a + "; " + std::to_string(b); });
+		std::string list_of_fail_quests;
+		list_of_fail_quests = std::accumulate(
+			adventurer.get_fail_quest_ids().begin(),
+			adventurer.get_fail_quest_ids().end(),
+			list_of_fail_quests,
+			[](std::string a, int b) { return a + "; " + std::to_string(b); });
+		
+		std::ostringstream result;
+		result << adventurer.get_id() << "::" << adventurer.get_name() << "->"
+			<< "[COMPLETED: "
+			<< (list_of_succ_quests.empty() ? "None" : list_of_succ_quests)
+			<< "]"
+			<< "[FAILED: "
+			<< (list_of_fail_quests.empty() ? "None" : list_of_fail_quests)
+			<< "]" << "\n"
+			<< "\tStatistics: "
+			<< "[RECRUITMENT COST: " << adventurer.get_recruitment_cost() << "]"
+			<< "[RETIREMENT COST: " << adventurer.get_retirement_cost() << "]"
+			<< "[LIVING EXPENSES: " << adventurer.get_living_expenses() << "]"
+			<< "\n";
+		return result.str();
 	}
 };
 
@@ -174,17 +231,38 @@ public:
 		return result.str();
 	}
 	
+	std::string show_failed(QuestKeeper& quest_keeper)
+	{
+		std::ostringstream result;
+		result << "Failed quests:\n";
+		for (auto&& quest : quest_keeper.get_failed())
+		{
+			result << quest_detail(*quest);
+		}
+		return result.str();
+	}
+	
 	std::string not_available()
 	{
-		return "Quest is not available or does not exist.\n";
+		return "Quest is not available or does not exist or guild has not enough funds to dispatch this adventurer.\n";
 	}
-public:
-	std::string quest_detail(const Quest& quest)
+private:
+	std::string quest_detail(Quest& quest)
 	{
 		std::ostringstream result;
 		result << quest.get_id() << "::" << quest.get_name() << "->"
-			<< "[FAME:" << quest.get_fame() << "]"
-			<< "[GOLD:" << quest.get_gold() << "]"
+			<< "[ATTEMPTED: "
+			<< (quest.get_adventurer_id() == -1 ? "Not yet" : std::to_string(quest.get_adventurer_id()))
+			<< "]"
+			<< "\n"
+			<< "\tReward for success: "
+			<< "[FAME: " << quest.get_reward().get_fame() << "]"
+			<< "[GOLD: " << quest.get_reward().get_gold() << "]"
+			<< "\n"
+			<< "\tPenalty for failure: "
+			<< "[FAME :" << quest.get_penalty().get_fame() << "]"
+			<< "[GOLD: " << quest.get_penalty().get_gold() << "]"
+			<< "[RISK OF DEATH: " << (quest.get_penalty().get_deadly() ? "YES" : "NO") << "]"
 			<< "\n";
 		return result.str();
 	}
