@@ -41,12 +41,22 @@ public:
 	int set_retirement_cost(int value) { retirement_cost = value; return retirement_cost; }
 	int get_living_expenses() const { return living_expenses; }
 	int set_living_expenses(int value) { living_expenses = value; return living_expenses; }
+	int get_experience() const { return experience; }
+	int set_experience(int value) { experience = value; return experience; }
+	int add_experience(int value) { experience += value; return experience; }
+	int rmv_experience(int value) { experience -= value; return experience; }
+	int get_retirement_fame() { return std::clamp(succ_quest_ids.size() - fail_quest_ids.size(), 1ull, 100ull); }
+	int get_level() { return std::clamp(1 + experience / 1000, 1, 10); }
+	int get_level_recruitment_cost() { return get_level() * recruitment_cost; }
+	int get_level_retirement_fame() { return get_level() * get_retirement_fame(); }
+	int get_level_retirement_cost() { return get_level() * retirement_cost; }
 private:
 	std::unordered_set<int> succ_quest_ids;
 	std::unordered_set<int> fail_quest_ids;
 	int recruitment_cost = 0;
 	int retirement_cost = 0;
 	int living_expenses = 0;
+	int experience = 0;
 };
 
 class Reward
@@ -86,11 +96,14 @@ public:
 	int set_adventurer_id(int value) { adventurer_id = value; return adventurer_id; }
 	QuestStateEnum get_state() const { return state; }
 	QuestStateEnum set_state(QuestStateEnum value) { state = value; return state; }
+	int get_difficulty() const { return difficulty; }
+	int set_difficulty(int value) { difficulty = std::clamp(value, 1, 10); return difficulty; }
 private:
 	Reward reward;
 	Penalty penalty;
 	QuestStateEnum state = QuestStateEnum::Undefined;
 	int adventurer_id = - 1;
+	int difficulty = 1;
 };
 
 typedef std::vector<std::unique_ptr<Adventurer>> adventurer_collection;
@@ -154,6 +167,8 @@ public:
 	{
 		available.clear();
 		hired.clear();
+		dead.clear();
+		inactive.clear();
 	}
 	bool recruit(int adventurer_id)
 	{
@@ -189,6 +204,7 @@ public:
 		quest->get_reward().set_fame(10);
 		quest->get_penalty().set_gold(100);
 		quest->get_penalty().set_fame(10);
+		quest->set_difficulty(2);
 		return std::move(quest);
 	}
 	void generate(int count)
@@ -203,6 +219,7 @@ public:
 		available.clear();
 		reserved.clear();
 		completed.clear();
+		failed.clear();
 	}
 	bool take(int quest_id)
 	{
@@ -300,7 +317,7 @@ public:
 	{
 		game_state.change_progress_state(true);
 		current_guild.set_fame(0);
-		current_guild.set_gold(100);
+		current_guild.set_gold(1000);
 		adventurers.generate(5);
 		quests.generate(10);
 	}
@@ -311,10 +328,10 @@ public:
 	inline bool pension(int adventurer_id)
 	{
 		const auto adventurer = CollectionIterators::find(adventurers.get_hired(), adventurer_id);
-		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_retirement_cost())
+		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_level_retirement_cost())
 		{
 			// Substract retirement cost
-			current_guild.rmv_gold(adventurer->get_retirement_cost());
+			current_guild.rmv_gold(adventurer->get_level_retirement_cost());
 			// Pension
 			return adventurers.pension(adventurer_id);
 		}
@@ -323,15 +340,59 @@ public:
 	inline bool recruit(int adventurer_id)
 	{
 		const auto adventurer = CollectionIterators::find(adventurers.get_available(), adventurer_id);
-		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_recruitment_cost())
+		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_level_recruitment_cost())
 		{
 			// Substract recruitment cost
-			current_guild.rmv_gold(adventurer->get_recruitment_cost());
+			current_guild.rmv_gold(adventurer->get_level_recruitment_cost());
 			// Recruit
 			return adventurers.recruit(adventurer_id);
 		}
 		return false;
 	}
+
+	inline int calculate_experience(int diff, int level)
+	{
+		int base = 1000;
+		int quest_multiplier = 11 - diff; // value from 1 to 10 (lv1 quest == 10, lv10 quest == 1)
+		int quest_reward = std::clamp((base / quest_multiplier), 100, 1000);
+		int level_bonus = diff / level;
+		return quest_reward * level_bonus;
+	}
+
+	inline bool calculate_success(unsigned long long chance, unsigned long long base)
+	{
+		return chance >= base;
+	}
+
+	inline bool calculate_total_success(unsigned long long base, int level, int diff)
+	{
+		bool final_result;
+
+		if (level - diff > 0) // x:1 is advantage, first success is result
+		{
+			final_result = false;
+			for (int i = 0; i < level - diff + 1 && final_result == false; ++i)
+			{
+				final_result = calculate_success(chance_generator.get_chance(), base);
+				std::cout << i << final_result << std::endl;
+			}
+		}
+		else if (level - diff < 0) // 1:x is disadvantage, first fail is result
+		{
+			final_result = true;
+			for (int i = 0; i < diff - level + 1 && final_result == true; ++i)
+			{
+				final_result = calculate_success(chance_generator.get_chance(), base);
+				std::cout << i << final_result << std::endl;
+			}
+		}
+		else // 1:1, base roll is returned
+		{
+			final_result = calculate_success(chance_generator.get_chance(), base);
+		}
+		return final_result;
+	}
+	
 	inline QuestStateEnum dispatch(int adventurer_id, int quest_id)
 	{
 		const auto adventurer = CollectionIterators::find(adventurers.get_hired(), adventurer_id);
@@ -347,11 +408,16 @@ public:
 				compare_value = std::clamp(compare_value, 10ull, 90ull);
 			}
 			// Calculate result
-			if (chance_generator.get_chance() >= compare_value)
+			const bool result = calculate_total_success(compare_value, adventurer->get_level(), quest->get_difficulty());
+			
+			// Finish valuation of quest
+			if (result)
 			{
 				// Get Reward
 				current_guild.add_gold(quest->get_reward().get_gold());
 				current_guild.add_fame(quest->get_reward().get_fame());
+				// Update experience
+				adventurer->add_experience(calculate_experience(quest->get_difficulty(), adventurer->get_level()));
 				
 				// Assign Quest - Adventurer and complete quest
 				quest->set_adventurer_id(adventurer_id);
@@ -367,7 +433,13 @@ public:
 				current_guild.rmv_fame(quest->get_penalty().get_fame());
 				if (quest->get_penalty().get_deadly())
 				{
+					// Just kill, no exp obtained sorry bro.
 					adventurers.kill(adventurer_id);					
+				}
+				else
+				{
+					// Update experience
+					adventurer->rmv_experience(calculate_experience(quest->get_difficulty(), adventurer->get_level()));
 				}
 				
 				// Assign Quest - Adventurer and fail quest

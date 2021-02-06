@@ -174,7 +174,8 @@ private:
 			[](std::string a, int b) { return a + "; " + std::to_string(b); });
 		
 		std::ostringstream result;
-		result << adventurer.get_id() << "::" << adventurer.get_name() << "->"
+		result << adventurer.get_id() << "::" << adventurer.get_name()
+			<< "::Experience::" << adventurer.get_experience() << "::Level::" << adventurer.get_level() << "->"
 			<< "[COMPLETED: "
 			<< (list_of_succ_quests.empty() ? "None" : list_of_succ_quests)
 			<< "]"
@@ -182,8 +183,12 @@ private:
 			<< (list_of_fail_quests.empty() ? "None" : list_of_fail_quests)
 			<< "]" << "\n"
 			<< "\tStatistics: "
-			<< "[RECRUITMENT COST: " << adventurer.get_recruitment_cost() << "]"
-			<< "[RETIREMENT COST: " << adventurer.get_retirement_cost() << "]"
+			<< "[RECRUITMENT COST: " << adventurer.get_recruitment_cost()
+				<< " F:" << adventurer.get_level_recruitment_cost() << "]"
+			<< "[RETIREMENT COST: " << adventurer.get_retirement_cost()
+				<< " F:" << adventurer.get_level_retirement_cost() << "]"
+			<< "[RETIREMENT FAME" << adventurer.get_retirement_fame()
+				<< " F:" << adventurer.get_level_retirement_fame() << "]"
 			<< "[LIVING EXPENSES: " << adventurer.get_living_expenses() << "]"
 			<< "\n";
 		return result.str();
@@ -250,7 +255,8 @@ private:
 	std::string quest_detail(Quest& quest)
 	{
 		std::ostringstream result;
-		result << quest.get_id() << "::" << quest.get_name() << "->"
+		result << quest.get_id() << "::" << quest.get_name()
+			<< "::Difficulty::" << quest.get_difficulty() << "->"
 			<< "[ATTEMPTED: "
 			<< (quest.get_adventurer_id() == -1 ? "Not yet" : std::to_string(quest.get_adventurer_id()))
 			<< "]"
