@@ -274,6 +274,14 @@ private:
 	}
 };
 
+class EncyclopediaInterface : public IDisplayeableInterface
+{
+public:
+	std::string to_string() override { return "Encyclopedia"; }
+	std::string wiki_quest_types() { return "Encyclopedia Quest Types: "; }
+	std::string wiki_skill_types() { return "Encyclopedia Skill Types: "; }
+};
+
 /// <summary>
 /// Set of interfaces for additional input's
 /// </summary>

@@ -4,291 +4,12 @@
 #include <string>
 #include <unordered_set>
 
+#include "GenericEntities.hpp"
+#include "Adventurers.hpp"
+#include "Quests.hpp"
 #include "ConsoleHelpers.hpp"
+#include "Skills.hpp"
 #include "Generators.hpp"
-
-enum class QuestStateEnum
-{
-	Success,
-	Failure,
-	Undefined
-};
-
-class NamedEntity
-{
-public:
-	NamedEntity(std::string entity_name) : name(entity_name), id(last_id++) {}
-	std::string get_name() const { return name; }
-	std::string set_name(std::string value) { name = value; return name; }
-	int get_id() const { return id; }
-protected:
-	std::string name = "Entity";
-	int id;
-	inline static int last_id = 0;
-};
-
-class Adventurer;
-class Quest;
-class Skill;
-
-class Adventurer : public NamedEntity
-{
-public:
-	Adventurer(std::string adventurer_name) : NamedEntity(adventurer_name) {}
-	std::unordered_set<int>& get_succ_quest_ids() { return succ_quest_ids; }
-	std::unordered_set<int>& set_succ_quest_id(int value) { succ_quest_ids.insert(value); return succ_quest_ids; }
-	std::unordered_set<int>& get_fail_quest_ids() { return fail_quest_ids; }
-	std::unordered_set<int>& set_fail_quest_id(int value) { fail_quest_ids.insert(value); return fail_quest_ids; }
-	int get_recruitment_cost() const { return recruitment_cost; }
-	int set_recruitment_cost(int value) { recruitment_cost = value; return recruitment_cost; }
-	int get_retirement_cost() const { return retirement_cost; }
-	int set_retirement_cost(int value) { retirement_cost = value; return retirement_cost; }
-	int get_living_expenses() const { return living_expenses; }
-	int set_living_expenses(int value) { living_expenses = value; return living_expenses; }
-	int get_experience() const { return experience; }
-	int set_experience(int value) { experience = value; return experience; }
-	int add_experience(int value) { experience += value; return experience; }
-	int rmv_experience(int value) { experience -= value; return experience; }
-	int get_retirement_fame() { return std::clamp(succ_quest_ids.size() - fail_quest_ids.size(), 1ull, 100ull); }
-	int get_level() { return std::clamp(1 + experience / 1000, 1, 10); }
-	int get_level_recruitment_cost() { return get_level() * recruitment_cost; }
-	int get_level_retirement_fame() { return get_level() * get_retirement_fame(); }
-	int get_level_retirement_cost() { return get_level() * retirement_cost; }
-private:
-	std::unordered_set<int> succ_quest_ids;
-	std::unordered_set<int> fail_quest_ids;
-	int recruitment_cost = 0;
-	int retirement_cost = 0;
-	int living_expenses = 0;
-	int experience = 0;
-};
-
-enum class QuestType
-{
-	Minions,
-	Boss,
-	Poison,
-	Bleeding,
-	Curse,
-	Elfs,
-	Dwarfs,
-	Fairies,
-	Magical,
-	Darkness,
-	Wilderness,
-	Dankness,
-	Memes,
-	Mimes,
-};
-
-class Reward
-{
-public:
-	int get_gold() const { return gold; }
-	int set_gold(int value) { gold = value; return gold; }
-	int get_fame() const { return fame; }
-	int set_fame(int value) { fame = value; return fame; }
-private:
-	int gold = 0;
-	int fame = 0;
-};
-
-class  Penalty
-{
-public:
-	int get_gold() const { return gold; }
-	int set_gold(int value) { gold = value; return gold; }
-	int get_fame() const { return fame; }
-	int set_fame(int value) { fame = value; return fame; }
-	bool get_deadly() const { return deadly; }
-	bool set_deadly(bool value) { deadly = value; return deadly; }
-private:
-	int gold = 0;
-	int fame = 0;
-	bool deadly = true;
-};
-
-class Quest : public NamedEntity
-{
-public:
-	Quest(std::string quest_name) : NamedEntity(quest_name) {}
-	Reward& get_reward() { return reward; }
-	Penalty& get_penalty() { return penalty; }
-	int get_adventurer_id() const { return adventurer_id; }
-	int set_adventurer_id(int value) { adventurer_id = value; return adventurer_id; }
-	QuestStateEnum get_state() const { return state; }
-	QuestStateEnum set_state(QuestStateEnum value) { state = value; return state; }
-	int get_difficulty() const { return difficulty; }
-	int set_difficulty(int value) { difficulty = std::clamp(value, 1, 10); return difficulty; }
-	std::unordered_set<QuestType>& get_quest_types() { return types; }
-	std::unordered_set<QuestType>& set_quest_types(QuestType value) { types.insert(value); return types; }
-	bool has_quest_type(QuestType value) { return types.contains(value); }
-private:
-	Reward reward;
-	Penalty penalty;
-	QuestStateEnum state = QuestStateEnum::Undefined;
-	int adventurer_id = - 1;
-	int difficulty = 1;
-	std::unordered_set<QuestType> types;
-};
-
-class Skill : NamedEntity
-{
-public:
-	Skill(std::string skill_name) : NamedEntity(skill_name) {}
-	virtual void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) = 0;
-};
-
-class Hoarder : Skill
-{
-public:
-	Hoarder() : Skill("Hoarder") {}
-	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
-	{
-		reward.set_gold(reward.get_gold() * 1.2);
-	}
-};
-class EscapeArtist : Skill
-{
-public:
-	EscapeArtist() : Skill("EscapeArtist") {}
-	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
-	{
-		ChanceGenerator chance;
-		penalty.set_deadly(penalty.get_deadly() && chance.get_chance() <= 75);
-	}
-};
-class MisterHandsome : Skill
-{
-public:
-	MisterHandsome() : Skill("MisterHandsome") {}
-	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
-	{
-		reward.set_fame(reward.get_fame() * 2.0);
-	}
-};
-class PerfectHero : Skill
-{
-public:
-	PerfectHero() : Skill("PerfectHero") {}
-	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
-	{
-		penalty.set_gold(0);
-		penalty.set_fame(0);
-		penalty.set_deadly(false);
-	}
-};
-
-class CounterSkill : Skill
-{
-public:
-	CounterSkill(std::string value) : Skill(value) {}
-	void execute_skill(bool& result, Quest& quest, Adventurer& adventurer, Reward& reward, Penalty& penalty) override
-	{
-		ChanceGenerator chance;
-		if (quest.has_quest_type(get_counter()))
-		{
-			result = result || chance.get_chance() > 75;
-		}
-	}
-	virtual QuestType get_counter() = 0;
-};
-class Cleave : CounterSkill
-{
-public:
-	Cleave() : CounterSkill("Cleave") {}
-	QuestType get_counter() override { return QuestType::Minions; }
-};
-class Assassin : CounterSkill
-{
-public:
-	Assassin() : CounterSkill("Assassin") {}
-	QuestType get_counter() override { return QuestType::Boss; }
-};
-class Mage : CounterSkill
-{
-public:
-	Mage() : CounterSkill("Mage") {}
-	QuestType get_counter() override { return QuestType::Magical; }
-};
-class Healer : CounterSkill
-{
-public:
-	Healer() : CounterSkill("Healer") {}
-	QuestType get_counter() override { return QuestType::Bleeding; }
-};
-class Paladin : CounterSkill
-{
-public:
-	Paladin() : CounterSkill("Paladin") {}
-	QuestType get_counter() override { return QuestType::Curse; }
-};
-class Shaman : CounterSkill
-{
-public:
-	Shaman() : CounterSkill("Shaman") {}
-	QuestType get_counter() override { return QuestType::Poison; }
-};
-class Fighter : CounterSkill
-{
-public:
-	Fighter() : CounterSkill("Fighter") {}
-	QuestType get_counter() override { return QuestType::Boss; }
-};
-class Lightbearer : CounterSkill
-{
-public:
-	Lightbearer() : CounterSkill("Lightbearer") {}
-	QuestType get_counter() override { return QuestType::Darkness; }
-};
-class SurvivalExpert : CounterSkill
-{
-public:
-	SurvivalExpert() : CounterSkill("SurvivalExpert") {}
-	QuestType get_counter() override { return QuestType::Wilderness; }
-};
-class Woodcutter : CounterSkill
-{
-public:
-	Woodcutter() : CounterSkill("Woodcutter") {}
-	QuestType get_counter() override { return QuestType::Elfs; }
-};
-class Digger : CounterSkill
-{
-public:
-	Digger() : CounterSkill("Digger") {}
-	QuestType get_counter() override { return QuestType::Dwarfs; }
-};
-class Pyromaniac : CounterSkill
-{
-public:
-	Pyromaniac() : CounterSkill("Pyromaniac") {}
-	QuestType get_counter() override { return QuestType::Elfs; }
-};
-class Bard : CounterSkill
-{
-public:
-	Bard() : CounterSkill("Bard") {}
-	QuestType get_counter() override { return QuestType::Memes; }
-};
-class Troll : CounterSkill
-{
-public:
-	Troll() : CounterSkill("Troll") {}
-	QuestType get_counter() override { return QuestType::Dankness; }
-};
-class Warlock : CounterSkill
-{
-public:
-	Warlock() : CounterSkill("Warlock") {}
-	QuestType get_counter() override { return QuestType::Fairies; }
-};
-class Clown : CounterSkill
-{
-public:
-	Clown() : CounterSkill("Clown") {}
-	QuestType get_counter() override { return QuestType::Mimes; }
-};
 
 typedef std::vector<std::unique_ptr<Adventurer>> adventurer_collection;
 typedef std::vector<std::unique_ptr<Quest>> quest_collection;
@@ -338,6 +59,13 @@ public:
 		adventurer->set_recruitment_cost(50);
 		adventurer->set_retirement_cost(10);
 		adventurer->set_living_expenses(50);
+		adventurer->set_skills(std::make_unique<PerfectHero>());
+		adventurer->set_skills(std::make_unique<MisterHandsome>());
+		adventurer->set_skills(std::make_unique<EscapeArtist>());
+		adventurer->set_skills(std::make_unique<Hoarder>());
+		adventurer->set_skills(std::make_unique<Cleave>());
+		adventurer->set_skills(std::make_unique<PerfectHero>());
+
 		return std::move(adventurer);
 	}
 	void generate(int count)
@@ -433,10 +161,10 @@ private:
 	NameGenerator name_generator;
 };
 
-class Guild : public NamedEntity
+class Guild : public NamedUniqueEntity
 {
 public:
-	Guild() : NamedEntity("My Guild") {}
+	Guild() : NamedUniqueEntity("My Guild") {}
 	int get_gold() const { return gold; }
 	int set_gold(int value) { gold = value; return gold; }
 	int add_gold(int value) { gold += value; return gold; }
@@ -519,6 +247,7 @@ public:
 		{
 			// Substract retirement cost
 			current_guild.rmv_gold(adventurer->get_level_retirement_cost());
+			current_guild.add_fame(adventurer->get_level_retirement_fame());
 			// Pension
 			return adventurers.pension(adventurer_id);
 		}
@@ -597,8 +326,10 @@ public:
 
 			Reward quest_reward = quest->get_reward();
 			Penalty quest_penalty = quest->get_penalty();
-			auto&& skill = std::make_unique<Hoarder>();
-			skill->execute_skill(result, *quest, *adventurer, quest_reward, quest_penalty);
+			for (auto && skill : adventurer->get_skills())
+			{
+				skill->execute_skill(result, *quest, quest_reward, quest_penalty);
+			}
 			
 			// Finish valuation of quest
 			if (result)
