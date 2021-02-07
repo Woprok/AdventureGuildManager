@@ -181,7 +181,7 @@ public:
 		adventurer->set_recruitment_cost(50);
 		adventurer->set_retirement_cost(10);
 		adventurer->set_living_expenses(50);
-		adventurer->set_experience(10050);
+		adventurer->set_experience(995);
 		adventurer->set_rarity(AdventurerRarity::Innkeeper);
 		adventurer->set_skills(keep.generate_from_rarity(static_cast<int>(adventurer->get_rarity())));
 
@@ -212,6 +212,10 @@ public:
 	bool kill(int adventurer_id)
 	{
 		return CollectionIterators::transfer(hired, dead, adventurer_id);
+	}
+	bool revive(int adventurer_id)
+	{
+		return CollectionIterators::transfer(dead, hired, adventurer_id);
 	}
 	const adventurer_collection& get_hired() { return hired; }
 	const adventurer_collection& get_available() { return available; }
@@ -293,6 +297,7 @@ public:
 	int rmv_fame(int value) { fame -= value; return fame; }
 	int get_diff() const { return diff; }
 	int set_diff(int value) { diff = value; return diff; }
+	int get_level() { return std::clamp(1 + fame / 1000, 1, 10); }
 	void clear()
 	{
 		set_name("My Guild");
@@ -300,10 +305,14 @@ public:
 		set_fame(0);
 		set_diff(0);
 	}
+
+	int get_max_quest_rarity() const { return quest_rarity; }
+	void set_max_quest_rarity(int max_quest_rarity) { quest_rarity = max_quest_rarity; }
 private:
 	int gold = 0;
 	int fame = 0;
 	int diff = 0;
+	int quest_rarity = 4;
 };
 
 class GameState

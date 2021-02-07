@@ -10,7 +10,7 @@ enum class AdventurerRarity
 	Adventurer = 1,
 	Hero = 2,
 	Innkeeper = 3,
-	DungeonMaster = 5
+	DungeonMaster = 5 // Keep this highest or change perk ?
 };
 
 class Adventurer : public NamedUniqueEntity

@@ -31,6 +31,7 @@
     <ClInclude Include="Headers\GameManagers.hpp" />
     <ClInclude Include="Headers\Generators.hpp" />
     <ClInclude Include="Headers\GenericEntities.hpp" />
+    <ClInclude Include="Headers\GuildPerks.hpp" />
     <ClInclude Include="Headers\Interfaces.hpp" />
     <ClInclude Include="Headers\Quests.hpp" />
     <ClInclude Include="Headers\Skills.hpp" />

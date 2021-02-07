@@ -30,10 +30,10 @@ enum class QuestRarity
 	Uncommon = 1,
 	Rare = 2,
 	Epic = 3,
-	War = 4,
+	War = 4, // All quest above this are not available unless you have specific perk
 	Legendary = 5,
 	Campaign = 6,
-	Special = 7,
+	Special = 7, // Keep this highest or change perk for it
 };
 
 class QuestTypeWrapper : public NamedEntity
