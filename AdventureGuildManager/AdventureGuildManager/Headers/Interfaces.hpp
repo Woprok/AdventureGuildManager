@@ -158,6 +158,16 @@ public:
 		return "Adventurer is not available to inactivate or you are missing necessary funds.\n";
 	}
 private:
+	static std::string translate_rarity(AdventurerRarity rarity)
+	{
+		switch (rarity) {
+		case AdventurerRarity::Adventurer: return "Adventurer";
+		case AdventurerRarity::Hero: return "Hero";
+		case AdventurerRarity::Innkeeper: return "Innkeeper";
+		case AdventurerRarity::DungeonMaster: return "DungeonMaster";
+		default: return "Undefined";
+		}
+	}
 	std::string adventurer_detail(Adventurer& adventurer)
 	{
 		std::string list_of_succ_quests;
@@ -176,6 +186,7 @@ private:
 		std::ostringstream result;
 		result << adventurer.get_id() << "::" << adventurer.get_name()
 			<< "::Experience::" << adventurer.get_experience() << "::Level::" << adventurer.get_level() << "->"
+			<< "::Rarity::" << translate_rarity(adventurer.get_rarity()) << "->"
 			<< "[COMPLETED: "
 			<< (list_of_succ_quests.empty() ? "None" : list_of_succ_quests)
 			<< "]"
@@ -187,7 +198,7 @@ private:
 				<< " F:" << adventurer.get_level_recruitment_cost() << "]"
 			<< "[RETIREMENT COST: " << adventurer.get_retirement_cost()
 				<< " F:" << adventurer.get_level_retirement_cost() << "]"
-			<< "[RETIREMENT FAME" << adventurer.get_retirement_fame()
+			<< "[RETIREMENT FAME: " << adventurer.get_retirement_fame()
 				<< " F:" << adventurer.get_level_retirement_fame() << "]"
 			<< "[LIVING EXPENSES: " << adventurer.get_living_expenses() << "]"
 			<< "\n";
@@ -252,11 +263,26 @@ public:
 		return "Quest is not available or does not exist or guild has not enough funds to dispatch this adventurer.\n";
 	}
 private:
+	static std::string translate_rarity(QuestRarity rarity)
+	{
+		switch (rarity) {
+			case QuestRarity::Common: return "Common";
+			case QuestRarity::Uncommon: return "Uncommon";
+			case QuestRarity::Rare: return "Rare";
+			case QuestRarity::Epic: return "Epic";
+			case QuestRarity::War: return "War";
+			case QuestRarity::Legendary: return "Legendary";
+			case QuestRarity::Campaign: return "Campaign";
+			case QuestRarity::Special: return "Special";
+			default: return "Undefined";
+		}
+	}
 	std::string quest_detail(Quest& quest)
 	{
 		std::ostringstream result;
 		result << quest.get_id() << "::" << quest.get_name()
 			<< "::Difficulty::" << quest.get_difficulty() << "->"
+			<< "::Rarity::" << translate_rarity(quest.get_rarity()) << "->"
 			<< "[ATTEMPTED: "
 			<< (quest.get_adventurer_id() == -1 ? "Not yet" : std::to_string(quest.get_adventurer_id()))
 			<< "]"
@@ -278,8 +304,32 @@ class EncyclopediaInterface : public IDisplayeableInterface
 {
 public:
 	std::string to_string() override { return "Encyclopedia"; }
-	std::string wiki_quest_types() { return "Encyclopedia Quest Types: "; }
-	std::string wiki_skill_types() { return "Encyclopedia Skill Types: "; }
+	std::string wiki_quest_types(EncyclopediaKeeper& keeper)
+	{
+		std::ostringstream result;
+		result << "Encyclopedia Quest Types: " << "\n";
+		for (auto && quest_type : keeper.get_quest_types())
+		{
+			result << "[" << static_cast<size_t>(quest_type.get_self()) << "]"
+				   << " " << quest_type.get_name() << " "
+				   << " --> " << quest_type.get_description()
+				   << "\n";
+		}
+
+		return result.str();
+	}
+	std::string wiki_skill_types(EncyclopediaKeeper& keeper)
+	{
+		std::ostringstream result;
+		result << "Encyclopedia Skill Types: " << "\n";
+		for (auto && skill : keeper.get_skills())
+		{
+			result << "[" << skill->get_skill_id() << "]"
+				<< " " << skill->get_name()
+				<< "\n";
+		}
+		return result.str();
+	}
 };
 
 /// <summary>

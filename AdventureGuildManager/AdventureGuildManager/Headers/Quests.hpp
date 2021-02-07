@@ -8,21 +8,57 @@
 
 enum class QuestType
 {
-	Minions,
-	Boss,
-	Poison,
-	Bleeding,
-	Curse,
-	Elfs,
-	Dwarfs,
-	Fairies,
-	Magical,
-	Darkness,
-	Wilderness,
-	Dankness,
-	Memes,
-	Mimes,
+	Minions = 1,
+	Boss = 2,
+	Poison = 3,
+	Bleeding = 4,
+	Curse = 5,
+	Elfs = 6,
+	Dwarfs = 7,
+	Fairies = 8,
+	Magical = 9,
+	Darkness = 10,
+	Wilderness = 11,
+	Dankness = 12,
+	Memes = 13,
+	Mimes = 14,
 };
+
+enum class QuestRarity
+{
+	Common = 0,
+	Uncommon = 1,
+	Rare = 2,
+	Epic = 3,
+	War = 4,
+	Legendary = 5,
+	Campaign = 6,
+	Special = 7,
+};
+
+class QuestTypeWrapper : public NamedEntity
+{
+public:
+	QuestTypeWrapper(QuestType type, std::string type_name, std::string type_desc) : NamedEntity(type_name), desc(type_desc), self(type) { }
+	const std::string& get_description() const { return desc; }
+	QuestType get_self() const { return self; }
+	bool operator==(const QuestTypeWrapper& qtw) const { return qtw.self == self; }
+	size_t operator()(const QuestTypeWrapper& qtw) const { return static_cast<size_t>(qtw.self); }
+private:
+	std::string desc;
+	QuestType self;
+};
+
+namespace std
+{
+	template<> struct hash<QuestTypeWrapper>
+	{
+		std::size_t operator()(QuestTypeWrapper const& s) const noexcept
+		{
+			return static_cast<size_t>(s.get_self());
+		}
+	};
+}
 
 enum class QuestStateEnum
 {
@@ -67,12 +103,15 @@ public:
 	std::unordered_set<QuestType>& get_quest_types() { return types; }
 	std::unordered_set<QuestType>& set_quest_types(QuestType value) { types.insert(value); return types; }
 	bool has_quest_type(QuestType value) { return types.contains(value); }
+	QuestRarity get_rarity() const { return rarity; }
+	QuestRarity set_rarity(QuestRarity value) { rarity = value; return rarity; }
 private:
 	Reward reward;
 	Penalty penalty;
 	QuestStateEnum state = QuestStateEnum::Undefined;
 	int adventurer_id = -1;
 	int difficulty = 1;
+	QuestRarity rarity = QuestRarity::Common;
 	std::unordered_set<QuestType> types;
 };
 

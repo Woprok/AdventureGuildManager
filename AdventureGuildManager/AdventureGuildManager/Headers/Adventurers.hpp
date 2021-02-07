@@ -5,6 +5,13 @@
 
 #include "Skills.hpp"
 
+enum class AdventurerRarity
+{
+	Adventurer = 1,
+	Hero = 2,
+	Innkeeper = 3,
+	DungeonMaster = 5
+};
 
 class Adventurer : public NamedUniqueEntity
 {
@@ -30,7 +37,9 @@ public:
 	int get_level_retirement_fame() { return get_level() * get_retirement_fame(); }
 	int get_level_retirement_cost() { return get_level() * retirement_cost; }
 	skill_collection& get_skills() { return skills; }
-	skill_collection& set_skills(std::unique_ptr<Skill>&& value) { skills.insert(std::move(value)); return skills; }
+	skill_collection& set_skills(std::unique_ptr<ISkill>&& value) { skills.insert(std::move(value)); return skills; }
+	AdventurerRarity get_rarity() const { return rarity; }
+	AdventurerRarity set_rarity(AdventurerRarity value) { rarity = value; return rarity; }
 private:
 	std::unordered_set<int> succ_quest_ids;
 	std::unordered_set<int> fail_quest_ids;
@@ -38,6 +47,7 @@ private:
 	int retirement_cost = 0;
 	int living_expenses = 0;
 	int experience = 0;
+	AdventurerRarity rarity = AdventurerRarity::Adventurer;
 	skill_collection skills;
 };
 

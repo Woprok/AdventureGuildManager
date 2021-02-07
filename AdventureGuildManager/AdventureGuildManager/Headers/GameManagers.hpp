@@ -44,6 +44,11 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestTakeCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestDispatchCommand>>());
 
+		// Encyclopedia
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaQuestTypesCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaSkillTypessCommand>>());
+
 		// Fallback, should be kept last while we keep them in the list
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ErrorCommand>>());
 	}

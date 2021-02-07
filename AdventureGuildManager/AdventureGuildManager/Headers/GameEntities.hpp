@@ -13,6 +13,7 @@
 
 typedef std::vector<std::unique_ptr<Adventurer>> adventurer_collection;
 typedef std::vector<std::unique_ptr<Quest>> quest_collection;
+typedef std::vector<std::string> string_context;
 
 class CollectionIterators
 {
@@ -50,6 +51,79 @@ public:
 	}
 };
 
+class EncyclopediaKeeper
+{
+public:
+	EncyclopediaKeeper()
+	{
+		// Generic
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Hoarder>>(1));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, EscapeArtist>>(2));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, MisterHandsome>>(3));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, PerfectHero>>(4));
+		// Counter Skills
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Cleave>>(100));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Assassin>>(101));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Mage>>(102));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Healer>>(103));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Paladin>>(104));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Shaman>>(105));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Fighter>>(106));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Lightbearer>>(107));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, SurvivalExpert>>(108));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Woodcutter>>(109));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Digger>>(110));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Pyromaniac>>(111));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Bard>>(112));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Troll>>(113));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Warlock>>(114));
+		skill_creators.push_back(std::make_unique<SimpleEntityCreator<ISkill, Clown>>(115));
+
+		create_skill_encyclopedia();
+		create_quest_types_encyclopedia();
+	}
+
+	std::unique_ptr<ISkill> get_random_skill()
+	{
+		for (auto && entity_creator_base : skill_creators)
+		{
+			skills.emplace_back(entity_creator_base->create_entity());
+		}
+		throw("Encyclopedia Keeper does not contain fallback type in collection of creators.");
+	}
+	const std::vector<std::unique_ptr<ISkill>>& get_skills() const { return skills; }
+	const std::unordered_set<QuestTypeWrapper>& get_quest_types() const { return quest_types; }
+protected:
+	void create_skill_encyclopedia()
+	{
+		for (auto&& entity_creator_base : skill_creators)
+		{
+			skills.emplace_back(entity_creator_base->create_entity());
+		}
+	}
+	void create_quest_types_encyclopedia()
+	{
+		quest_types.insert(QuestTypeWrapper(QuestType::Minions, "Minions", "Multiple enemies."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Boss, "Boss", "Big guy."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Poison, "Poison", "Danger of poison is guaranteed."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Bleeding, "Bleeding", "You will bleed out quite fast."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Curse, "Curse", "You will end harmed on this quest in many ways."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Elfs, "Elfs", "See dwarfs."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Dwarfs, "Dwarfs", "See elfs."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Fairies, "Fairies", "Little jokers."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Magical, "Magical", "Atla is alive."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Darkness, "Darkness", "Why did you not bring torch ?"));
+		quest_types.insert(QuestTypeWrapper(QuestType::Wilderness, "Wilderness", "Location is filled with primordial beings."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Dankness, "Dankness", "Dank."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Memes, "Memes", "Dark side of internet."));
+		quest_types.insert(QuestTypeWrapper(QuestType::Mimes, "Mimes", "Annoying."));
+	}
+private:
+	std::vector<std::unique_ptr<EntityCreatorBase<ISkill>>> skill_creators;
+	std::vector<std::unique_ptr<ISkill>> skills;
+	std::unordered_set<QuestTypeWrapper> quest_types;
+};
+
 class AdventurerKeeper
 {
 public:
@@ -59,12 +133,12 @@ public:
 		adventurer->set_recruitment_cost(50);
 		adventurer->set_retirement_cost(10);
 		adventurer->set_living_expenses(50);
-		adventurer->set_skills(std::make_unique<PerfectHero>());
-		adventurer->set_skills(std::make_unique<MisterHandsome>());
-		adventurer->set_skills(std::make_unique<EscapeArtist>());
-		adventurer->set_skills(std::make_unique<Hoarder>());
-		adventurer->set_skills(std::make_unique<Cleave>());
-		adventurer->set_skills(std::make_unique<PerfectHero>());
+		adventurer->set_skills(std::make_unique<PerfectHero>(999));
+		adventurer->set_skills(std::make_unique<MisterHandsome>(998));
+		adventurer->set_skills(std::make_unique<EscapeArtist>(997));
+		adventurer->set_skills(std::make_unique<Hoarder>(996));
+		adventurer->set_skills(std::make_unique<Cleave>(995));
+		adventurer->set_skills(std::make_unique<PerfectHero>(994));
 
 		return std::move(adventurer);
 	}
@@ -216,6 +290,7 @@ public:
 	Guild current_guild;
 	AdventurerKeeper adventurers;
 	QuestKeeper quests;
+	EncyclopediaKeeper encyclopedia;
 	inline void clear_game_state()
 	{
 		game_state.clear();

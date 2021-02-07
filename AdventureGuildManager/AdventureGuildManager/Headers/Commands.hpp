@@ -9,7 +9,6 @@
 #include "Interfaces.hpp"
 #include "GameEntities.hpp"
 
-typedef std::vector<std::string> string_context;
 
 template<class TInterface>
 class CreatorBase
@@ -561,7 +560,7 @@ public:
 	}
 	std::string execute(GameData& game_data) override
 	{
-		return interface.wiki_skill_types();
+		return interface.wiki_skill_types(game_data.encyclopedia);
 	}
 private:
 	EncyclopediaInterface interface;
@@ -579,7 +578,7 @@ public:
 	}
 	std::string execute(GameData& game_data) override
 	{
-		return interface.wiki_quest_types();
+		return interface.wiki_quest_types(game_data.encyclopedia);
 	}
 private:
 	EncyclopediaInterface interface;
