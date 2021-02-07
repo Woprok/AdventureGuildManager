@@ -182,6 +182,14 @@ private:
 			adventurer.get_fail_quest_ids().end(),
 			list_of_fail_quests,
 			[](std::string a, int b) { return a + "; " + std::to_string(b); });
+
+
+		std::string list_of_skills;
+		list_of_skills = std::accumulate(
+			adventurer.get_skills().begin(),
+			adventurer.get_skills().end(),
+			list_of_skills,
+			[](std::string a, const std::unique_ptr<ISkill>& b) { return a + "; " + b->get_name(); });
 		
 		std::ostringstream result;
 		result << adventurer.get_id() << "::" << adventurer.get_name()
@@ -201,6 +209,10 @@ private:
 			<< "[RETIREMENT FAME: " << adventurer.get_retirement_fame()
 				<< " F:" << adventurer.get_level_retirement_fame() << "]"
 			<< "[LIVING EXPENSES: " << adventurer.get_living_expenses() << "]"
+			<< "\n"
+			<< "[SKILLS: "
+			<< (list_of_skills.empty() ? "None" : list_of_skills)
+			<< "]"
 			<< "\n";
 		return result.str();
 	}
@@ -279,6 +291,13 @@ private:
 	}
 	std::string quest_detail(Quest& quest)
 	{
+		std::string list_of_types;
+		list_of_types = std::accumulate(
+			quest.get_quest_types().begin(),
+			quest.get_quest_types().end(),
+			list_of_types,
+			[](std::string a, const QuestType& b) { return a + "; " + std::to_string(static_cast<int>(b)); });
+		
 		std::ostringstream result;
 		result << quest.get_id() << "::" << quest.get_name()
 			<< "::Difficulty::" << quest.get_difficulty() << "->"
@@ -295,7 +314,11 @@ private:
 			<< "[FAME :" << quest.get_penalty().get_fame() << "]"
 			<< "[GOLD: " << quest.get_penalty().get_gold() << "]"
 			<< "[RISK OF DEATH: " << (quest.get_penalty().get_deadly() ? "YES" : "NO") << "]"
-			<< "\n";
+			<< "\n"
+			<< "[TYPES: "
+			<< (list_of_types.empty() ? "None" : list_of_types)
+			<< "]"
+			<< "\n";;
 		return result.str();
 	}
 };

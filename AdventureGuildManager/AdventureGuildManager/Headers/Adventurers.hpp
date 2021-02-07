@@ -40,6 +40,33 @@ public:
 	skill_collection& set_skills(std::unique_ptr<ISkill>&& value) { skills.insert(std::move(value)); return skills; }
 	AdventurerRarity get_rarity() const { return rarity; }
 	AdventurerRarity set_rarity(AdventurerRarity value) { rarity = value; return rarity; }
+	skill_collection& set_skills(skill_collection skill_collection)
+	{
+		skills.merge(skill_collection);
+		return skills;
+	}
+	/// <summary>
+	/// remove last skill if possible
+	/// </summary>
+	void rmv_skill(int count)
+	{
+		for (int i = 0; i < count; ++i)
+		{
+			// This can be inefficient, there is only like 10 skills at max. In most cases 1.
+			if (!skills.empty())
+			{
+				std::mt19937 rng(time(0)); // random number generator (seeded with time(0))
+				std::uniform_int_distribution<unsigned> d(0, skills.size() - 1);
+				// returns a random number from [0, skills.size() - 1]
+				unsigned r = d(rng);
+				// iterates through the container to the r-th element
+				auto it = skills.begin();
+				for (; it != skills.end() && r > 0; ++it, r--) {}
+				// erasing the selected element
+				skills.erase(it);
+			}
+		}
+	}
 private:
 	std::unordered_set<int> succ_quest_ids;
 	std::unordered_set<int> fail_quest_ids;

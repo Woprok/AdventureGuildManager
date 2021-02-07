@@ -53,6 +53,56 @@ protected:
 };
 
 #pragma region Commands
+class DebugCommand : public ICommand
+{
+public:
+	DebugCommand(string_context& command_context) : ICommand(command_context) { }
+
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() == 1
+			&& command_context[0] == "debug";
+	}
+	std::string execute(GameData& game_data) override
+	{
+		std::cout << "Extended Debug Code follows:\n";
+		// Does nothing by default.
+
+		//debug_rarity_quest(game_data);
+		//debug_rarity_adventurer(game_data);
+		debug_level_up_down(game_data);
+
+		return "";
+	}
+private:
+	void debug_level_up_down(GameData& game_data)
+	{
+		const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), 1);
+		auto old_lvl = adventurer->get_level();
+		adventurer->add_experience(-10000);
+		auto new_lvl = adventurer->get_level();
+		game_data.resolve_level(adventurer, old_lvl, new_lvl);
+	}
+	void debug_rarity_quest(GameData& game_data)
+	{
+		auto&& types = game_data.encyclopedia.generate_from_rarity(QuestRarity::War);
+		for (auto&& type : types)
+		{
+			std::cout << static_cast<int>(type) << "\n";
+		}
+	}
+	void debug_rarity_adventurer(GameData& game_data)
+	{
+		skill_collection collection;
+		collection.insert(std::make_unique<Hoarder>(1));
+		auto&& types = game_data.encyclopedia.generate_from_rarity(static_cast<int>(AdventurerRarity::Innkeeper), collection);
+		for (auto&& type : types)
+		{
+			std::cout << type->get_name() << "\n";
+		}
+	}
+};
+
 class MenuCommand : public ICommand
 {
 public:

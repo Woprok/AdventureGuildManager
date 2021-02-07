@@ -105,6 +105,11 @@ public:
 	bool has_quest_type(QuestType value) { return types.contains(value); }
 	QuestRarity get_rarity() const { return rarity; }
 	QuestRarity set_rarity(QuestRarity value) { rarity = value; return rarity; }
+	std::unordered_set<QuestType>& set_quest_types(std::unordered_set<QuestType> set_of_types)
+	{
+		types.merge(set_of_types);
+		return types;
+	}
 private:
 	Reward reward;
 	Penalty penalty;

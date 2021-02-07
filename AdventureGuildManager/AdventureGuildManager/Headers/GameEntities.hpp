@@ -82,12 +82,52 @@ public:
 		create_skill_encyclopedia();
 		create_quest_types_encyclopedia();
 	}
+	
+	skill_collection generate_from_rarity(int skill_count)
+	{
+		const skill_collection raw;
+		return generate_from_rarity(skill_count, raw);
+	}
+	skill_collection generate_from_rarity(int skill_count, const skill_collection& restriction)
+	{
+		std::unordered_set<int> raw = raw_skills;
+		if (!restriction.empty())
+		{
+			for (auto&& skill : restriction)
+			{
+				raw.erase(skill->get_skill_id());
+			}
+		}
+		std::unordered_set<int> result;
+		std::sample(raw.begin(),
+			raw.end(),
+			std::inserter(result, result.begin()),
+			std::clamp(skill_count, 0, static_cast<int>(raw.size())),
+			std::mt19937{ std::random_device{}() });
 
-	std::unique_ptr<ISkill> get_random_skill()
+		skill_collection return_skills;
+		for (auto && value : result)
+		{
+			return_skills.insert(create_skill(value));
+		}
+		return return_skills;
+	}
+	std::unordered_set<QuestType> generate_from_rarity(QuestRarity quest_rarity)
+	{
+		std::unordered_set<QuestType> result;
+		std::sample(raw_quests.begin(),
+			raw_quests.end(),
+			std::inserter(result, result.begin()),
+			std::clamp(static_cast<int>(quest_rarity), 0, static_cast<int>(raw_quests.size())),
+			std::mt19937{ std::random_device{}() });
+		return result;
+	}
+	std::unique_ptr<ISkill> create_skill(int value)
 	{
 		for (auto && entity_creator_base : skill_creators)
 		{
-			skills.emplace_back(entity_creator_base->create_entity());
+			if (entity_creator_base->get_skill_id() == value)
+				return entity_creator_base->create_entity();
 		}
 		throw("Encyclopedia Keeper does not contain fallback type in collection of creators.");
 	}
@@ -98,7 +138,9 @@ protected:
 	{
 		for (auto&& entity_creator_base : skill_creators)
 		{
-			skills.emplace_back(entity_creator_base->create_entity());
+			auto skill = entity_creator_base->create_entity();
+			raw_skills.insert(skill->get_skill_id());
+			skills.emplace_back(std::move(skill));
 		}
 	}
 	void create_quest_types_encyclopedia()
@@ -117,36 +159,39 @@ protected:
 		quest_types.insert(QuestTypeWrapper(QuestType::Dankness, "Dankness", "Dank."));
 		quest_types.insert(QuestTypeWrapper(QuestType::Memes, "Memes", "Dark side of internet."));
 		quest_types.insert(QuestTypeWrapper(QuestType::Mimes, "Mimes", "Annoying."));
+		for (auto&& type : quest_types)
+		{
+			raw_quests.insert(type.get_self());
+		}
 	}
 private:
 	std::vector<std::unique_ptr<EntityCreatorBase<ISkill>>> skill_creators;
 	std::vector<std::unique_ptr<ISkill>> skills;
 	std::unordered_set<QuestTypeWrapper> quest_types;
+	std::unordered_set<QuestType> raw_quests;
+	std::unordered_set<int> raw_skills;
 };
 
 class AdventurerKeeper
 {
 public:
-	std::unique_ptr<Adventurer> create_adventurer()
+	std::unique_ptr<Adventurer> create_adventurer(EncyclopediaKeeper& keep)
 	{
 		auto&& adventurer = std::make_unique<Adventurer>(name_generator.create_person_name());
 		adventurer->set_recruitment_cost(50);
 		adventurer->set_retirement_cost(10);
 		adventurer->set_living_expenses(50);
-		adventurer->set_skills(std::make_unique<PerfectHero>(999));
-		adventurer->set_skills(std::make_unique<MisterHandsome>(998));
-		adventurer->set_skills(std::make_unique<EscapeArtist>(997));
-		adventurer->set_skills(std::make_unique<Hoarder>(996));
-		adventurer->set_skills(std::make_unique<Cleave>(995));
-		adventurer->set_skills(std::make_unique<PerfectHero>(994));
+		adventurer->set_experience(10050);
+		adventurer->set_rarity(AdventurerRarity::Innkeeper);
+		adventurer->set_skills(keep.generate_from_rarity(static_cast<int>(adventurer->get_rarity())));
 
 		return std::move(adventurer);
 	}
-	void generate(int count)
+	void generate(EncyclopediaKeeper& keep, int count)
 	{
 		for (int i = 0; i < count; ++i)
 		{
-			available.push_back(create_adventurer());
+			available.push_back(create_adventurer(keep));
 		}
 	}
 	void clear()
@@ -183,7 +228,7 @@ private:
 class QuestKeeper
 {
 public:
-	std::unique_ptr<Quest> create_quest()
+	std::unique_ptr<Quest> create_quest(EncyclopediaKeeper& keep)
 	{
 		auto&& quest = std::make_unique<Quest>(name_generator.create_quest_name());
 		quest->get_reward().set_gold(100);
@@ -191,16 +236,15 @@ public:
 		quest->get_penalty().set_gold(100);
 		quest->get_penalty().set_fame(10);
 		quest->set_difficulty(2);
-		quest->set_quest_types(QuestType::Boss);
-		quest->set_quest_types(QuestType::Minions);
-		quest->set_quest_types(QuestType::Elfs);
+		quest->set_rarity(QuestRarity::Epic);
+		quest->set_quest_types(keep.generate_from_rarity(quest->get_rarity()));
 		return std::move(quest);
 	}
-	void generate(int count)
+	void generate(EncyclopediaKeeper& keep, int count)
 	{
 		for (int i = 0; i < count; ++i)
 		{
-			available.push_back(create_quest());
+			available.push_back(create_quest(keep));
 		}
 	}
 	void clear()
@@ -308,8 +352,8 @@ public:
 		game_state.change_progress_state(true);
 		current_guild.set_fame(0);
 		current_guild.set_gold(1000);
-		adventurers.generate(5);
-		quests.generate(10);
+		adventurers.generate(encyclopedia, 5);
+		quests.generate(encyclopedia, 10);
 	}
 	inline void rename_guild(std::string new_name)
 	{
@@ -381,7 +425,20 @@ public:
 		}
 		return final_result;
 	}
-	
+
+	void resolve_level(Adventurer* const adventurer, int old_lvl, int new_lvl)
+	{
+		const int skill_count = new_lvl / 5 - old_lvl / 5;
+		if (skill_count > 0)
+		{
+				adventurer->set_skills(encyclopedia.generate_from_rarity(skill_count, adventurer->get_skills()));
+		}
+		else if (skill_count < 0) // level down at 5 and 10 does something
+		{
+			adventurer->rmv_skill(-skill_count); // lose last skill obtained, sorry :)
+		}
+	}
+
 	inline QuestStateEnum dispatch(int adventurer_id, int quest_id)
 	{
 		const auto adventurer = CollectionIterators::find(adventurers.get_hired(), adventurer_id);
@@ -413,7 +470,10 @@ public:
 				current_guild.add_gold(quest_reward.get_gold());
 				current_guild.add_fame(quest_reward.get_fame());
 				// Update experience
+				auto old_lvl = adventurer->get_level();
 				adventurer->add_experience(calculate_experience(quest->get_difficulty(), adventurer->get_level()));
+				auto new_lvl = adventurer->get_level();
+				resolve_level(adventurer, old_lvl, new_lvl);
 				
 				// Assign Quest - Adventurer and complete quest
 				quest->set_adventurer_id(adventurer_id);
@@ -435,7 +495,10 @@ public:
 				else
 				{
 					// Update experience
+					auto old_lvl = adventurer->get_level();
 					adventurer->rmv_experience(calculate_experience(quest->get_difficulty(), adventurer->get_level()));
+					auto new_lvl = adventurer->get_level();
+					resolve_level(adventurer, old_lvl, new_lvl);
 				}
 				
 				// Assign Quest - Adventurer and fail quest

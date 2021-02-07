@@ -11,6 +11,9 @@ class CommandManager
 public:
 	CommandManager()
 	{
+		// Debug Commands
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, DebugCommand>>());
+		
 		// Generic
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuRestartCommand>>());

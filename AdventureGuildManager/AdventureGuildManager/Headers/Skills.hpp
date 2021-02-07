@@ -12,6 +12,7 @@ class EntityCreatorBase
 public:
 	virtual ~EntityCreatorBase() = default;
 	virtual std::unique_ptr<TInterface> create_entity() = 0;
+	virtual int get_skill_id() = 0;
 };
 
 template<class TInterface, class TCreatable>
@@ -24,9 +25,11 @@ public:
 	{
 		return std::make_unique<TCreatable>(skill_id);
 	}
+	int get_skill_id() override { return skill_id; }
 protected:
 	int skill_id;
 };
+
 
 class ISkill : public NamedEntity
 {
@@ -35,9 +38,22 @@ public:
 	virtual ~ISkill() = default;
 	virtual void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) = 0;
 	int get_skill_id() const { return skill_id; }
+	//bool operator==(const ISkill& qtw) const { return qtw.skill_id == skill_id; }
+	//size_t operator()(const ISkill& qtw) const { return static_cast<size_t>(qtw.skill_id); }
 protected:
 	int skill_id;
 };
+
+/*namespace std
+{
+	template<> struct hash<ISkill>
+	{
+		std::size_t operator()(QuestTypeWrapper const& s) const noexcept
+		{
+			return static_cast<size_t>(s.get_self());
+		}
+	};
+}*/
 
 typedef std::unordered_set<std::unique_ptr<ISkill>> skill_collection;
 
