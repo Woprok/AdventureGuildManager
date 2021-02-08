@@ -1,144 +1,5 @@
-﻿#ifndef GUILD_PERKS_HPP
-#define GUILD_PERKS_HPP
-
-#include "Commands.hpp"
-#include "GameEntities.hpp"
-
-// Definition of all guild perk should be here:
-// Perk has to be bought by player
-// Once bought it will remain until end of game
-// Some perks can be bought multiple-times
-
-/*
-2-> (Enable Command) Trade fame for gold ?
-3->Adventurer Experience gain increased by X % ? (cca 25 ? )
-4-> (Enable Command) Retrain adventurer skills randomly ?
-5->Can obtain quest of rarity >= 5 ?
-6-> (EnableCommand)Upgrade adventurer rarity for X gold ?
-7->Fame from retirement increased by X % (like 300 %)
-8-> (EnableCommand)Resurrect adventurer for X* level gold ?
-9-> Godslayers (Lot of fame gain/lose, can't die, no gold gain/lose)
-10-> Overlord of Country
-*/
-
-class Godslayer : public ISkill
-{
-public:
-	Godslayer(int id) : ISkill(id, "Hoarder") {}
-	void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) override
-	{
-		reward.set_gold(reward.get_gold() * gold_multi);
-		reward.set_fame(reward.get_fame() * fame_multi);
-		penalty.set_deadly(false);
-		penalty.set_gold(penalty.get_gold() *gold_multi);
-		penalty.set_fame(penalty.get_fame() * fame_multi);
-		
-		ChanceGenerator chance;
-		result = result || chance.get_chance() > min_to_success;
-	}
-private:
-	const double fame_multi = 10;
-	const double gold_multi = 0;
-	const int min_to_success = 10;
-};
-
-class PerkInterface : public IDisplayeableInterface
-{
-public:
-	std::string to_string() override
-	{
-		return "Welcome to perk overview!\n";
-	}
-};
-
-class GuildPerk
-{
-public:
-	GuildPerk(int level_restriction) : guild_level_required(level_restriction) {}
-	virtual ~GuildPerk() = default;
-	virtual bool fulfill_requirements(GameData& game_data)
-	{
-		return game_data.current_guild.get_level() >= guild_level_required;
-	}
-	virtual void execute_guild_perk(Guild& guild) {}
-	virtual void execute_quest_perk(Reward& reward, Penalty& penalty) {}
-private:
-	const int guild_level_required;
-};
-
-class PerkTradeFameForGold : public GuildPerk
-{
-public:
-	PerkTradeFameForGold() : GuildPerk(2) { } 
-};
-class PerkExperienceBonus : public GuildPerk
-{
-public:
-	PerkExperienceBonus() : GuildPerk(3) { }
-	void execute_quest_perk(Reward& reward, Penalty& penalty) override
-	{
-		reward.set_gold(reward.get_gold() * gold_reward_multiplayer);
-		penalty.set_gold(penalty.get_gold() * gold_penalty_multiplayer);
-	}
-private:
-	const double gold_reward_multiplayer = 1.25;
-	const double gold_penalty_multiplayer = 0.75;
-};
-class PerkRetrainAdventurer : public GuildPerk
-{
-public:
-	PerkRetrainAdventurer() : GuildPerk(4) { }
-};
-class PerkQuestRarityUpgrade : public GuildPerk
-{
-public:
-	PerkQuestRarityUpgrade() : GuildPerk(5) { }
-	void execute_guild_perk(Guild& guild) override
-	{
-		guild.set_max_quest_rarity(max_quest_rarity);
-	}
-private:
-	const int max_quest_rarity = static_cast<int>(QuestRarity::Special);
-};
-
-class PerkUpgradeAdventurerRarity : public GuildPerk
-{
-public:
-	PerkUpgradeAdventurerRarity() : GuildPerk(6) { }
-};
-
-class PerkFamousAdventurers : public GuildPerk
-{
-public:
-	PerkFamousAdventurers() : GuildPerk(7) { }
-	void execute_quest_perk(Reward& reward, Penalty& penalty) override
-	{
-		reward.set_fame(reward.get_fame() * fame_reward_multiplayer);
-		penalty.set_fame(penalty.get_fame() * fame_penalty_multiplayer);
-	}
-private:
-	const double fame_reward_multiplayer = 3.0;
-	const double fame_penalty_multiplayer = 0.33;
-};
-
-class PerkResurrectAdventurer : public GuildPerk
-{
-public:
-	PerkResurrectAdventurer() : GuildPerk(8) { }
-};
-
-class PerkGrantGodslayers : public GuildPerk
-{
-public:
-	PerkGrantGodslayers() : GuildPerk(9) { }
-};
-
-class PerkOverlordOfCountry : public GuildPerk
-{
-public:
-	PerkOverlordOfCountry() : GuildPerk(10) { }
-};
-
+﻿#ifndef PERK_COMMANDS_HPP
+#define PERK_COMMANDS_HPP
 
 class PerkCommand : public ICommand
 {
@@ -169,7 +30,7 @@ public:
 	std::string execute(GameData& game_data) override
 	{
 		int fame_to_convert = InputInterface::get_id(context.size() == 3 ? context[2] : "");
-		
+
 		if (trade(game_data, fame_to_convert))
 		{
 
@@ -302,10 +163,10 @@ public:
 	std::string execute(GameData& game_data) override
 	{
 		int adventurer_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
-		
+
 		if (resurrect(game_data, adventurer_id))
 		{
-			
+
 		}
 		return interface.to_string();
 	}
@@ -369,4 +230,38 @@ private:
 	const int ressurection_cost = 1000;
 	PerkInterface interface;
 };
+
+class PerkBuyCommand : public ICommand
+{
+public:
+	PerkBuyCommand(string_context& command_context) : ICommand(command_context) { }
+	static bool can_derive_from(string_context& command_context)
+	{
+		return command_context.size() >= 2
+			&& (command_context[0] == "perk" || command_context[0] == "p")
+			&& (command_context[0] == "buy" || command_context[0] == "-b");
+	}
+	std::string execute(GameData& game_data) override
+	{
+		int perk_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+
+		if (buy_perk(game_data, perk_id))
+		{
+
+		}
+		return interface.to_string();
+	}
+private:
+	bool buy_perk(GameData& game_data, int perk_id)
+	{
+		if (game_data.current_guild.check_perk())
+		{
+
+		}
+		return false;
+	}
+	const int ressurection_cost = 1000;
+	PerkInterface interface;
+};
+
 #endif

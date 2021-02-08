@@ -1,7 +1,12 @@
 ﻿#ifndef CONSOLE_PROCESSORS_HPP
 #define CONSOLE_PROCESSORS_HPP
 
+#include <iostream>
+#include <string>
+#include <vector>
+
 #include "ConsoleHelpers.hpp"
+
 
 class ConsoleProcessors
 {

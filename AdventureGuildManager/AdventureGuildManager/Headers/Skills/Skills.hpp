@@ -1,101 +1,89 @@
 ﻿#ifndef SKILLS_HPP
 #define SKILLS_HPP
 
-#include "GameEntities.hpp"
-#include "Generators.hpp"
-#include "GenericEntities.hpp"
-#include "Quests.hpp"
+#include "../Interfaces/ISkills.hpp"
 
-template<class TInterface>
-class EntityCreatorBase
+class Lucky final : public ISkill
 {
 public:
-	virtual ~EntityCreatorBase() = default;
-	virtual std::unique_ptr<TInterface> create_entity() = 0;
-	virtual int get_skill_id() = 0;
-};
-
-template<class TInterface, class TCreatable>
-class SimpleEntityCreator : public EntityCreatorBase<TInterface>
-{
-	static_assert(std::is_base_of<TInterface, TCreatable>::value, "TCreatable must be derived from TInterface");
-public:
-	SimpleEntityCreator(int defined_skill_id) : skill_id(defined_skill_id) {}
-	std::unique_ptr<TInterface> create_entity() override
+	Lucky(int new_id) : ISkill("Lucky", new_id, "Sometimes you are protected by luck.") {}
+	~Lucky() override = default;
+	const std::string& get_description() override { return description; }
+	void execute_skill() override 
 	{
-		return std::make_unique<TCreatable>(skill_id);
-	}
-	int get_skill_id() override { return skill_id; }
-protected:
-	int skill_id;
-};
-
-
-class ISkill : public NamedEntity
-{
-public:
-	ISkill(int defined_skill_id, std::string skill_name) : NamedEntity(skill_name), skill_id(defined_skill_id) {}
-	virtual ~ISkill() = default;
-	virtual void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) = 0;
-	int get_skill_id() const { return skill_id; }
-	//bool operator==(const ISkill& qtw) const { return qtw.skill_id == skill_id; }
-	//size_t operator()(const ISkill& qtw) const { return static_cast<size_t>(qtw.skill_id); }
-protected:
-	int skill_id;
-};
-
-/*namespace std
-{
-	template<> struct hash<ISkill>
-	{
-		std::size_t operator()(QuestTypeWrapper const& s) const noexcept
-		{
-			return static_cast<size_t>(s.get_self());
-		}
-	};
-}*/
-
-typedef std::unordered_set<std::unique_ptr<ISkill>> skill_collection;
-
-class Hoarder : public ISkill
-{
-public:
-	Hoarder(int id) : ISkill(id,"Hoarder") {}
-	void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) override
-	{
-		reward.set_gold(reward.get_gold() * 1.2);
+		
 	}
 };
-class EscapeArtist : public ISkill
+class GoldHoarder final : public ISkill
 {
 public:
-	EscapeArtist(int id) : ISkill(id, "EscapeArtist") {}
-	void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) override
+	GoldHoarder(int new_id) : ISkill("Gold Hoarder", new_id, "There is always a hidden treasure.") {}
+	~GoldHoarder() override = default;
+	void execute_skill() override
 	{
-		ChanceGenerator chance;
-		penalty.set_deadly(penalty.get_deadly() && chance.get_chance() <= 75);
+		//reward.set_gold(reward.get_gold() * bonus_gold_factor);
 	}
+private:
+	const double bonus_gold_factor = 1.25;
 };
-class MisterHandsome : public ISkill
+class Entertainer final : public ISkill
 {
 public:
-	MisterHandsome(int id) : ISkill(id, "MisterHandsome") {}
-	void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) override
+	Entertainer(int new_id) : ISkill("Entertainer", new_id, "All stories are worth telling.") {}
+	~Entertainer() override = default;
+	void execute_skill() override
 	{
-		reward.set_fame(reward.get_fame() * 2.0);
+		//reward.set_fame(reward.get_fame() * bonus_fame_factor);
 	}
+private:
+	const double bonus_fame_factor = 1.25;
 };
-class PerfectHero : public ISkill
+class EscapeArtist final : public ISkill
 {
 public:
-	PerfectHero(int id) : ISkill(id,"PerfectHero") {}
-	void execute_skill(bool& result, Quest& quest, Reward& reward, Penalty& penalty) override
+	EscapeArtist(int new_id) : ISkill("Escape Artist", new_id, "Did somebody say I can't escape death?") {}
+	~EscapeArtist() override = default;
+	void execute_skill() override
 	{
-		penalty.set_gold(0);
-		penalty.set_fame(0);
-		penalty.set_deadly(false);
+		//penalty.set_deadly(penalty.get_deadly() && chance.get_chance() <= 75);
 	}
+private:
+	const double survive_chance = 75;
+	//ChanceGenerator chance;
 };
+class Noble final : public ISkill
+{
+public:
+	Noble(int new_id) : ISkill("Noble", new_id, "It was not my fault!") {}
+	~Noble() override = default;
+	void execute_skill() override
+	{
+		//penalty.set_gold(penalty.get_gold() * reduction_gold_factor);
+		//penalty.set_fame(penalty.get_fame() * reduction_fame_factor);
+	}
+private:
+	const double reduction_gold_factor = 0.25;
+	const double reduction_fame_factor = 0.25;
+};
+class Godslayer : public ISkill
+{
+public:
+	Godslayer(int new_id) : ISkill("Godslayer", new_id, "I once surpassed my limits a little.") {}
+	~Godslayer() override = default;
+	void execute_skill() override
+	{
+	}
+private:
+	const double bonus_fame_factor = 1.25;
+	const double bonus_gold_factor = 1.25;
+	const double reduction_gold_factor = 0.25;
+	const double reduction_fame_factor = 0.25;
+	const double survive_chance = 75;
+};
+
+
+
+/*/
 class CounterSkill : public ISkill
 {
 public:
@@ -209,5 +197,5 @@ public:
 };
 #pragma endregion 
 
-
+*/
 #endif

@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <chrono>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <numeric>
 #include <random>
@@ -12,7 +13,6 @@
 #include <vector>
 
 #include "../Headers/GameManagers.hpp"
-#include "../Headers/Generators.hpp"
 
 /// <summary>
 /// Call's game manager and that's it.

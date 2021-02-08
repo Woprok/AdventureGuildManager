@@ -161,7 +161,7 @@ Game Developement Steps:
 
 4.1. Let the Adventurers have Info
 	Expected Blocks of Code:
-		[Entity] Quest
+		[Entity] Adventurer
 			* int Id
 	Functional Requirements:
 		- Player can Print Guild Adventurers by using command "guild adventurer show ADVENTURER_ID"
@@ -270,7 +270,7 @@ Game Developement Steps:
 		- Heroes Level is based on current experience signature function
 			- Function is part of class ? that describes amount of experience per level
 			- Min level is 1 max level is 10
-			- Adventurer can lose level is he loses experience
+			- Adventurer can lose level if he loses experience
 			- Adventurer level increases his hire and retirement cost
 			- retiring adventurer of higher level grants more fame
 		- Quest success calculation considers advantage and disadvantage
@@ -288,25 +288,31 @@ Game Developement Steps:
 					- reroll
 					- applies one decrement per roll
 		
-11-12. Let the Quest have types and heroes skills
+11. Let the Quest have types and heroes skills
 	Expected Blocks of Code:
 		[Entity] Skill
-			* int Id
+			* int Name
 		[Entity] Adventurer
 			* Collection<Skill> Skills
-		[Entity] QuestType
+		[Entity_Enum] QuestType
 		[Entity] Quest
-			* QuestType Type
+			* Collection<QuestType> Type
 	Functional Requirements:
+		- Player can show all defined quest types by using command game questtypes show
 		- Player can show all defined skills by using command game skills show
-			- Each skill is printed on separate line and prints all information including SkillId
-		- Heroes start with random selection of skills before they are hired equal to their level
-		- Heroes get random skill on level up from these they don't have yet
+		- QuestType is defined in code as simple enum
 		- Skill will be defined in code
-		- Player can show all defined quest typesby using command game questtypes show
-		- For each quest type that is not fullfilled by adventurer, quest level is increased for him, can be over the 10
-		- For each quest type that adventurer fullfills, quest level is decreased for him, minimum level 0
-			- minimum level 0 result in automatic success without rolls
+			- Each skill has different effect on quest dispatch
+			- More might be added later...
+
+12. Let skills be there for heroes.
+		[Entity] Adventurer, Quest
+			* Enum Rarity
+		- Adventurers start with selection of skills
+			- Number of skills 1 - 3 (1:Adventurer, 2:Hero, 3:Innkeeper)
+			- Each skill must be unique
+		- Adventurers get additional skill at level 5 and at level 10
+			- Skill can be lost if their level decreases
 
 13. Guild has progression
 	Expected Blocks of Code:
@@ -317,11 +323,10 @@ Game Developement Steps:
 		- Fame defines Guild Prestige Level
 		- After dispatching quest prestige is updated
 		- Each Prestige Level unlocks perks available to buy
-		- If Prestige level should be decreased or guild funds reach negative number guild is disbanded and player loses
 		- If player reaches Prestige level 11 he wins the game
-			- By default Prestige level rank up can demand also specific amount of task to be completed
-			- For example quest completed count or adventurer count
-			- Can require adventurer to posses special guild perks like Hero, Saviour of Empire etc.
+			//- By default Prestige level rank up can demand also specific amount of task to be completed
+			//- For example quest completed count or adventurer count
+			//- Can require adventurer to posses special guild perks like Hero, Saviour of Empire etc.
 		- Perks range from adventurer based, special skill unlockment, special quest unlockment. 
 			- unlocking special option guild adventurer retrain SKILL_ID -> SKILL_ID
 		- Perks are used by dispatchers? automatically if possible and applied where they are legit
@@ -329,6 +334,9 @@ Game Developement Steps:
 14. Finishing touches
 	Expected Blocks of Code:
 		- Refactoring
+		- If guild fame or guild funds reach negative number guild is disbanded and player loses
+		- Game Glued Gameplay Loop
+		- Guild Difficulty effect on generation and etc.
 	Functional Requirements:
 		- Refactoring
 		- Bugfixing

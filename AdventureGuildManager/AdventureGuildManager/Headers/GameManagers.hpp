@@ -1,10 +1,17 @@
 ﻿#ifndef GAME_MANAGERS_HPP
 #define GAME_MANAGERS_HPP
 
-#include "../Headers/Interfaces.hpp"
-#include "../Headers/ConsoleHelpers.hpp"
-#include "../Headers/ConsoleProcessors.hpp"
-#include "../Headers/Commands.hpp"
+#include "Helpers/ConsoleProcessors.hpp"
+#include "Interfaces/ICommands.hpp"
+#include "UserCommands/AdventurerCommands.hpp"
+#include "UserCommands/DebugCommands.hpp"
+#include "UserCommands/EncyclopediaCommands.hpp"
+#include "UserCommands/ErrorCommands.hpp"
+#include "UserCommands/ExitCommands.hpp"
+#include "UserCommands/GuildCommands.hpp"
+#include "UserCommands/HelpCommands.hpp"
+#include "UserCommands/MenuCommands.hpp"
+#include "UserCommands/QuestCommands.hpp"
 
 class CommandManager
 {
@@ -16,15 +23,16 @@ public:
 		
 		// Generic
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuCommand>>());
-		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuRestartCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuStartCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuEndCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuDifficultyCommand>>());
+
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, HelpCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ExitCommand>>());
 
 		// Guild
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildInfoCommand>>());
-		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildCreateCommand>>());
-		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildDifficultyCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildRenameCommand>>());
 		
 		// Adventurer
@@ -40,7 +48,7 @@ public:
 		// Quest
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestAvailableCommand>>());
-		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestReserverCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestReservedCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCompletedCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestFailedCommand>>());
 		// Quest Actions
@@ -92,7 +100,7 @@ public:
 	}
 private:
 	CommandManager command_manager;
-	GameData game_data;
+	GameDataManager game_data;
 };
 
 #endif
