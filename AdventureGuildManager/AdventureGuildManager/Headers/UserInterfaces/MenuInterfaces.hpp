@@ -3,6 +3,8 @@
 
 #include <string>
 
+
+#include "InputInterfaces.hpp"
 #include "../Interfaces/IDisplayableInterfaces.hpp"
 
 class MenuInterfaces final : public IDisplayeableInterfaces
@@ -50,11 +52,12 @@ public:
 		result_stream << "Learn more by using \"help\"." << "\n";
 		return result_stream.str();
 	}
-	std::string display_difficulty() const
+	std::string display_difficulty(int new_difficulty) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventure Guild Manager!*****" << "\n";
 		result_stream << "Game difficulty was changed!" << "\n";
+		result_stream << "Current difficulty: " << new_difficulty << "\n";
 		result_stream << "Learn more by using \"help\"." << "\n";
 		return result_stream.str();
 	}

@@ -5,11 +5,30 @@
 
 
 #include "Entities/AdventurerEntities.hpp"
-#include "Entities/GameStates.hpp"
+#include "Entities/QuestEntities.hpp"
 #include "Entities/GuildEntitiess.hpp"
-#include "Helpers/CollectionIterators.hpp"
-#include "Skills/Skills.hpp"
+#include "Entities/GameStates.hpp"
 
+#include "DataKeepers/AdventurerDataKeepers.hpp"
+#include "DataKeepers/SkillDataKeepers.hpp"
+#include "DataKeepers/QuestDataKeepers.hpp"
+
+#include "Generators/AdventurerGenerators.hpp"
+#include "Generators/QuestGenerators.hpp"
+
+#include "Perks/Perks.hpp"
+
+constexpr int MIN_QUEST_COUNT = 5;
+constexpr int MAX_QUEST_COUNT = 10;
+constexpr int MIN_ADVENTURER_COUNT = 3;
+constexpr int MAX_ADVENTURER_COUNT = 10;
+constexpr int DEFAULT_QUEST_RESERVATION_GOLD_RENT = 50;
+constexpr int DEFAULT_FAME_TO_GOLD_RATE = 10;
+constexpr int DEFAULT_RESSURECTION_COST = 1000;
+constexpr int DEFAULT_RETRAIN_COST_PER_SKILL = 250;
+constexpr int DEFAULT_UPGRADE_COST_PER_RARITY_DIFF = 250;
+constexpr int DEFAULT_GODSLAYER_COST = 500;
+constexpr int DEFAULT_COST_PER_LEVEL_PERK = 500;
 
 class GameDataManager
 {
@@ -17,223 +36,100 @@ public:
 	GameDataManager()
 	{
 		game_state = std::make_unique<GameState>();
-		guild = std::make_unique<Guild>();
 	}
 	std::unique_ptr<GameState> game_state;
 	std::unique_ptr<Guild> guild;
+	std::unique_ptr<QuestDataKeeper> quests;
+	std::unique_ptr<AdventurerDataKeeper> adventurers;
+	std::unique_ptr<QuestGenerator> gen_quests;
+	std::unique_ptr<AdventurerGenerator> gen_adventurers;
+	std::unique_ptr<SkillDataKeeper> skills;
 
-	//clear_game_state is original name
-	void start_game(); // create game
-	void end_game(); // end game
-	bool rename_guild(const std::string& cs);
-	void change_difficulty(const int new_difficulty);
+	/// <summary>
+	/// Create new game.
+	/// </summary>
+	void start_game();
+	/// <summary>
+	/// Progress game to next turn.
+	/// </summary>
+	void wait_turn();
+	/// <summary>
+	/// End current game.
+	/// </summary>
+	void end_game();
+	/// <summary>
+	/// Change guild name. Return is mostly true, rare cases false.
+	/// </summary>
+	bool rename_guild(const std::string&& new_guild_name);
+	/// <summary>
+	/// Change difficulty. Return is true value of new difficulty.
+	/// </summary>
+	int change_difficulty(const int new_difficulty);
+	/// <summary>
+	/// Accept quest. Return is true or false if quest was not found in available.
+	/// </summary>
 	bool take_quest(const int quest_id);
-	bool dispatch(const int adventurer_id, const int quest_id); //true on did something, else false
+	/// <summary>
+	/// Hire adventurer. Return is true or false if adventurer was not found in available.
+	/// </summary>
 	bool hire_adventurer(const int adventurer_id); //true on did something, else false
-	bool pension_adventurer(const int adventurer_id); //true on did something, else false
-	/*
-	class GuildCreateCommand : public ICommand
-	{
-	public:
-		std::string execute(GameData& game_data) override
-		{
-			if (game_data.game_state.get_progress_state())
-				return interface.game_in_progress();
-			game_data.create_game();
-			return interface.to_string(game_data.current_guild);
-		}
-	private:
-		GuildInterfaces interface;
-	};*/
+	/// <summary>
+	/// Retire adventurer. Return is true or false if adventurer was not found in hired or not enough money.
+	/// </summary>
+	bool pension_adventurer(const int adventurer_id);
 
-	bool trade(GameData& game_data, int fame_to_convert)
-	{
-		const int fame_conversion_rate = 10;
-		if (game_data.current_guild.check_perk())
-		{
-			// block negative and insufficient fame funds
-			if (fame_to_convert > 0 && game_data.current_guild.get_fame() >= fame_to_convert)
-			{
-				// Substract fame and add gold
-				game_data.current_guild.rmv_fame(fame_to_convert);
-				game_data.current_guild.add_gold(fame_to_convert * fame_conversion_rate);
-				return true;
-			}
-		}
-		return false;
-	}
-	bool retrain(GameData& game_data, int adventurer_id)
-	{
-		const int retrain_per_skill = 250;
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			const int adventurer_skill_count = adventurer->get_skills().size();
-			const int retrain_cost = adventurer_skill_count * retrain_per_skill;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= retrain_cost)
-			{
-				// Substract retrain cost
-				game_data.current_guild.rmv_gold(retrain_cost);
-				// retrain is remove and add (chance that some skill stay is completely fine)
-				adventurer->rmv_skill(adventurer_skill_count);
-				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(adventurer_skill_count, adventurer->get_skills()));
-				return true;
-			}
-		}
-		return false;
-	}
-	bool upgrade(GameData& game_data, int adventurer_id)
-	{
-		const int upgrade_cost_per_level = 250;
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			const int upgrade_cost = get_cost_multiplayer(adventurer->get_rarity()) * upgrade_cost_per_level;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= upgrade_cost)
-			{
-				// Substract upgrade cost
-				game_data.current_guild.rmv_gold(upgrade_cost);
-				// upgrade
-				const int skill_gain = get_skill_gain(adventurer->get_rarity());
-				adventurer->set_rarity(AdventurerRarity::DungeonMaster);
-				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(skill_gain, adventurer->get_skills()));
-				return true;
-			}
-		}
-		return false;
-	}
-	int get_cost_multiplayer(AdventurerRarity rarity) const
-	{
-		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, 10);
-	}
-	int get_skill_gain(AdventurerRarity rarity) const
-	{
-		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, INT32_MAX);
-	}
-	bool resurrect(GameData& game_data, int adventurer_id)
-	{
-		const int ressurection_cost = 1000;
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_dead(), adventurer_id);
-			const int revive_cost = adventurer->get_level_recruitment_cost() + ressurection_cost;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= revive_cost)
-			{
-				// Substract revive cost
-				game_data.current_guild.rmv_gold(revive_cost);
-				// resurrect
-				return game_data.adventurers.revive(adventurer_id);
-			}
-		}
-		return false;
-	}
-	bool buy_perk(GameData& game_data, int perk_id)
-	{
-		const int ressurection_cost = 1000;
-		if (game_data.current_guild.check_perk())
-		{
 
-		}
-		return false;
-	}
-	bool grant_godslayer(GameData& game_data, int adventurer_id)
-	{
-		const int ressurection_cost = 1000;
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			if (adventurer != nullptr)
-			{
-				// Grant skill
-				adventurer->set_skills(std::make_unique<Godslayer>(1000));
-				// Remove option ??? note in perk ??? TODO
-				return true;
-			}
-		}
-		return false;
-	}
+
+	/// <summary>
+	/// Trade fame for gold. Return is true or false if not enough.
+	/// </summary>
+	bool trade(int fame_to_convert);
+	/// <summary>
+	/// Ressurect adventurer for gold. Return is true or false if not dead or found.
+	/// </summary>
+	bool resurrect(int adventurer_id);
+	/// <summary>
+	/// Retrain adventurer skills for gold. Return is true or false if not hired or found.
+	/// </summary>
+	bool retrain(int adventurer_id);
+	/// <summary>
+	/// Upgrade adventurer rarity for gold. Return is true or false if not hired or found.
+	/// Up to Innkeeper.
+	/// </summary>
+	bool upgrade(int adventurer_id);
+	/// <summary>
+	/// Grant adventurer special skill for gold. Return is true or false if not hired or found.
+	/// Adventurer becomes god.
+	/// </summary>
+	bool grant_godslayer(int adventurer_id);
+	/// <summary>
+	/// Buy perk for a guild.
+	/// Adventurer becomes god.
+	/// </summary>
+	bool buy_perk(int perk_id);
+protected:
+	/// <summary>
+	/// Clear current game state.
+	/// </summary>
+	void reset_game();
+	/// <summary>
+	/// Progress game by generating new quests and adventurers.
+	/// </summary>
+	void progress_game();
+	void generate_quests(int quest_count);
+	void generate_adventurers(int adventurer_count);
+	void substract_quest_wait_fees();
+	void substract_adventurer_wait_fees();
+
+
+	 //true on did something, else false
+	bool dispatch(const int adventurer_id, const int quest_id);
+
+	
+
+
 };
 /*/
-#include <string>
-#include <unordered_set>
-
-#include "GenericEntities.hpp"
-#include "Adventurers.hpp"
-#include "Quests.hpp"
-#include "ConsoleHelpers.hpp"
-#include "Skills.hpp"
-#include "Generators.hpp"
-#include "GuildPerks.hpp"
-
-
-
-
-
-
-
-
-
-
-
-
-
-class GameManagerData
-{
-public:
-	GameState game_state;
-	Guild current_guild;
-	AdventurerKeeper adventurers;
-	QuestKeeper quests;
-	EncyclopediaKeeper encyclopedia;
-	inline void clear_game_state()
-	{
-		game_state.clear();
-		current_guild.clear();
-		adventurers.clear();
-		quests.clear();
-	}
-	/// <summary>
-	/// Basically you need gold, so there is only one way to get gold at start...
-	/// Due to this we can say that any setting can be done before.
-	/// And as there is no reason to reset them, they will be kept.
-	/// </summary>
-	inline void create_game()
-	{
-		game_state.change_progress_state(true);
-		current_guild.set_fame(0);
-		current_guild.set_gold(1000);
-		adventurers.generate(encyclopedia, 5);
-		quests.generate(encyclopedia, 10);
-	}
-	inline void rename_guild(std::string new_name)
-	{
-		current_guild.set_name(new_name);
-	}
-	inline bool pension(int adventurer_id)
-	{
-		const auto adventurer = CollectionIterators::find(adventurers.get_hired(), adventurer_id);
-		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_level_retirement_cost())
-		{
-			// Substract retirement cost
-			current_guild.rmv_gold(adventurer->get_level_retirement_cost());
-			current_guild.add_fame(adventurer->get_level_retirement_fame());
-			// Pension
-			return adventurers.pension(adventurer_id);
-		}
-		return false;
-	}
-	inline bool recruit(int adventurer_id)
-	{
-		const auto adventurer = CollectionIterators::find(adventurers.get_available(), adventurer_id);
-		if (adventurer != nullptr && current_guild.get_gold() >= adventurer->get_level_recruitment_cost())
-		{
-			// Substract recruitment cost
-			current_guild.rmv_gold(adventurer->get_level_recruitment_cost());
-			// Recruit
-			return adventurers.recruit(adventurer_id);
-		}
-		return false;
-	}
 
 	inline int calculate_experience(int diff, int level)
 	{

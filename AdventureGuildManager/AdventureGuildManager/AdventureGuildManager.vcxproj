@@ -20,22 +20,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\AdventureGuildManager.cpp" />
+    <ClCompile Include="Sources\GameDataManagers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\DataKeepers\PerkDataKeepers.hpp" />
     <ClInclude Include="Headers\Entities\CommonDataEntities.hpp" />
+    <ClInclude Include="Headers\Generators\AdventurerGenerators.hpp" />
+    <ClInclude Include="Headers\Generators\QuestGenerators.hpp" />
     <ClInclude Include="Headers\Helpers\CollectionIterators.hpp" />
     <ClInclude Include="Headers\Helpers\EntityCreators.hpp" />
     <ClInclude Include="Headers\Helpers\StringContexts.hpp" />
     <ClInclude Include="Headers\Interfaces\IPerks.hpp" />
     <ClInclude Include="Headers\Interfaces\ISkills.hpp" />
-    <ClInclude Include="Headers\Keepers\AdventurerKeepers.hpp" />
+    <ClInclude Include="Headers\DataKeepers\AdventurerDataKeepers.hpp" />
     <ClInclude Include="Headers\Entities\AdventurerEntities.hpp" />
     <ClInclude Include="Headers\Command.hpp" />
     <ClInclude Include="Headers\Entities\GameStates.hpp" />
     <ClInclude Include="Headers\Entities\GuildEntitiess.hpp" />
-    <ClInclude Include="Headers\Keepers\QuestTypeKeeper.hpp" />
-    <ClInclude Include="Headers\Keepers\QuestKeepers.hpp" />
-    <ClInclude Include="Headers\Keepers\SkillKeepers.hpp" />
+    <ClInclude Include="Headers\DataKeepers\QuestDataKeepers.hpp" />
+    <ClInclude Include="Headers\DataKeepers\SkillDataKeepers.hpp" />
     <ClInclude Include="Headers\Skills\QuestTypeCounterSkills.hpp" />
     <ClInclude Include="Headers\UserCommands\AdventurerCommands.hpp" />
     <ClInclude Include="Headers\Interfaces\ICommands.hpp" />
@@ -43,7 +46,7 @@
     <ClInclude Include="Headers\Helpers\ConsoleProcessors.hpp" />
     <ClInclude Include="Headers\GameDataManagers.hpp" />
     <ClInclude Include="Headers\GameManagers.hpp" />
-    <ClInclude Include="Headers\Helpers\Generators.hpp" />
+    <ClInclude Include="Headers\Generators\NeutralGenerators.hpp" />
     <ClInclude Include="Headers\Entities\BasicEntities.hpp" />
     <ClInclude Include="Headers\Perks\Perks.hpp" />
     <ClInclude Include="Headers\UserCommands\DebugCommands.hpp" />

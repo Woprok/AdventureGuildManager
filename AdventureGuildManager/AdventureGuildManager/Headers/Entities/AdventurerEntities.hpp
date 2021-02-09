@@ -10,27 +10,31 @@
 #include "BasicEntities.hpp"
 #include "../Interfaces/ISkills.hpp"
 
+constexpr int MIN_ADVENTURER_LEVEL = 1;
+constexpr int MAX_ADVENTURER_LEVEL = 10;
+
 enum class AdventurerRarity
 {
 	Commoner = 0,
 	Adventurer = 1,
 	Hero = 2,
 	Innkeeper = 3,
-	God = 4,
+	God = 5,
 	DungeonMaster = 10
 };
 
+typedef std::vector<AdventurerRarity> adventurer_rarity_vector;
 typedef std::unordered_set<int> quest_set;
 
 class Adventurer : public IdNameEntity
 {
 public:
 	Adventurer(std::string& new_name, AdventurerRarity new_rarity, int new_experience,
-		int new_recruit_cost, int new_retire_cost, int new_living_cost, skill_set& new_skill_set)
+		int new_recruit_cost, int new_retire_cost, int new_living_cost, skill_set&& new_skill_set)
 		: IdNameEntity(new_name, auto_id++), rarity(new_rarity), recruit_cost(new_recruit_cost),
 		  retire_cost(new_retire_cost), living_cost(new_living_cost), experience(new_experience)
 	{
-		set_skills(new_skill_set);
+		set_skills(std::move(new_skill_set));
 	}
 
 	virtual ~Adventurer() = default;
@@ -43,7 +47,7 @@ public:
 
 	int get_retire_fame() const { return std::clamp(success_quests.size() - failure_quests.size(), 1ull, 100ull); }
 
-	int get_level() const { return std::clamp(1 + experience.get_value() / 1000, 1, 10); }
+	int get_level() const { return std::clamp(1 + experience.get_value() / 1000, MIN_ADVENTURER_LEVEL, MAX_ADVENTURER_LEVEL); }
 
 	int get_level_recruit_cost() const { return get_level() * recruit_cost.get_value(); }
 	int get_level_retire_cost() const { return get_level() * retire_cost.get_value(); }
@@ -56,7 +60,7 @@ public:
 
 	skill_set& get_skills() { return skills; }
 	skill_set& set_skills(std::unique_ptr<ISkill>&& new_skill) { skills.insert(std::move(new_skill)); return skills; }
-	skill_set& set_skills(skill_set& new_skill_set)	{ skills.merge(new_skill_set); return skills; }
+	skill_set& set_skills(skill_set&& new_skill_set)	{ skills.merge(new_skill_set); return skills; }
 	/// <summary>
 	/// Attempt to remove del_count of skills from adventurer in random order.
 	/// </summary>

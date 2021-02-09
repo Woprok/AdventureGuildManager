@@ -17,6 +17,7 @@ protected:
 	std::string description;
 };
 
+typedef std::unordered_set<std::unique_ptr<IPerk>> perk_set;
 /*/
 class GuildPerk
 {

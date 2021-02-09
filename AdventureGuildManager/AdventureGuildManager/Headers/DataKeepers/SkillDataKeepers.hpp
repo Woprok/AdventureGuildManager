@@ -1,5 +1,5 @@
-﻿#ifndef SKILL_KEEPERS_HPP
-#define SKILL_KEEPERS_HPP
+﻿#ifndef SKILL_DATA_KEEPERS_HPP
+#define SKILL_DATA_KEEPERS_HPP
 
 #include <iterator>
 #include <memory>
@@ -9,6 +9,8 @@
 
 #include "../Helpers/EntityCreators.hpp"
 #include "../Interfaces/ISkills.hpp"
+#include "../Interfaces/IPerks.hpp"
+#include "../Perks/Perks.hpp"
 #include "../Skills/QuestTypeCounterSkills.hpp"
 #include "../Skills/Skills.hpp"
 
@@ -18,41 +20,50 @@ typedef std::unordered_set<int> IdSet;
 template<typename TSkill>
 using FullSkillCreator = IdEntityCreator<ISkill, TSkill>;
 
-class SkillKeeper
+class SkillDataKeeper
 {
 public:
-	SkillKeeper()
+	SkillDataKeeper()
 	{
 		fill_skill_creator();
 		finalize_skill_instances();
 	}
-	~SkillKeeper() = default;
+	~SkillDataKeeper() = default;
 	
 	/// <summary>
 	/// Uses default restriction system.
 	/// </summary>
-	skill_set generate(int skill_count)
+	skill_set&& generate(int skill_count)
 	{
-		return generate_skills(skill_count, get_raw_options(restricted_skills));
+		return std::move(generate_skills(skill_count, get_raw_options(restricted_skills)));
 	}
 	/// <summary>
-	/// Uses custom restriction sytem.
+	/// Uses custom restriction sytem with default system.
 	/// </summary>
-	skill_set generate(int skill_count, const skill_set& restriction)
+	skill_set&& generate(int skill_count, const skill_set& restriction)
 	{
-		return generate_skills(skill_count, get_raw_options(restriction));
+		return std::move(generate_skills(skill_count, get_raw_options(restriction)));
 	}
 
+	std::unique_ptr<ISkill> create_skill(int skill_id)
+	{
+		if (skill_creators.contains(skill_id))
+		{
+			return skill_creators[skill_id]->create_entity();
+		}
+		throw("SkillDataKeeper does not contain fallback type.");
+	}
+	
 	const skill_set& get_defined_skills() const { return skill_instances; }
 protected:
 	std::unordered_map<int, VirtualSkillCreator> skill_creators{};
 	skill_set skill_instances{};
-	skill_set restricted_skills{ std::unique_ptr<Lucky>() };
+	skill_set restricted_skills{ std::make_unique<Godslayer>(GODSLAYER_ID) };
 	IdSet skill_ids{};
 
 	void fill_skill_creator()
 	{
-		skill_creators[0] = std::make_unique<FullSkillCreator<Godslayer>>(0);
+		skill_creators[GODSLAYER_ID] = std::make_unique<FullSkillCreator<Godslayer>>(GODSLAYER_ID);
 		skill_creators[1] = std::make_unique<FullSkillCreator<Lucky>>(1);
 		skill_creators[2] = std::make_unique<FullSkillCreator<GoldHoarder>>(2);
 		skill_creators[3] = std::make_unique<FullSkillCreator<Entertainer>>(3);
@@ -93,10 +104,14 @@ private:
 		{
 			raw.erase(skill->get_id());
 		}
+		for (auto&& skill : restricted_skills)
+		{
+			raw.erase(skill->get_id());
+		}
 		return raw;
 	}
 
-	skill_set generate_skills(int skill_count, const IdSet&& raw_set)
+	skill_set&& generate_skills(int skill_count, const IdSet&& raw_set)
 	{
 		std::unordered_set<int> result;
 		std::sample(raw_set.begin(),
@@ -110,16 +125,7 @@ private:
 		{
 			return_skills.insert(create_skill(value));
 		}
-		return return_skills;
-	}
-
-	std::unique_ptr<ISkill> create_skill(int skill_id)
-	{
-		if (skill_creators.contains(skill_id))
-		{
-			return skill_creators[skill_id]->create_entity();
-		}
-		throw("SkillKeeper does not contain fallback type.");
+		return std::move(return_skills);
 	}
 };
 

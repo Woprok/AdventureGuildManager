@@ -38,6 +38,21 @@ public:
 		}
 		return nullptr;
 	}
+
+	template<class T>
+	static T* find(const std::unordered_set<std::unique_ptr<T>>& source, int id)
+	{
+		const auto it = std::find_if(source.begin(), source.end(),
+			[id](auto&& item)
+			{
+				return item->get_id() == id;
+			});
+		if (it != source.end())
+		{
+			return it->get();
+		}
+		return nullptr;
+	}
 };
 
 #endif

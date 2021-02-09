@@ -18,6 +18,9 @@
     <ClCompile Include="Sources\AdventureGuildManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\GameDataManagers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Command.hpp">
@@ -101,15 +104,6 @@
     <ClInclude Include="Headers\Entities\GameStates.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Keepers\QuestKeepers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\Keepers\AdventurerKeepers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\Helpers\Generators.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\Helpers\CollectionIterators.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -149,16 +143,31 @@
     <ClInclude Include="Headers\Helpers\StringContexts.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Keepers\SkillKeepers.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\Keepers\QuestTypeKeeper.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\UserInterfaces\SharedConvertors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Skills\QuestTypeCounterSkills.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Generators\AdventurerGenerators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Generators\QuestGenerators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Generators\NeutralGenerators.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\DataKeepers\SkillDataKeepers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\DataKeepers\AdventurerDataKeepers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\DataKeepers\QuestDataKeepers.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\DataKeepers\PerkDataKeepers.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

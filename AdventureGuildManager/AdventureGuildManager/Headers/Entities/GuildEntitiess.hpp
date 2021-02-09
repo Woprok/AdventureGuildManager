@@ -9,31 +9,42 @@
 
 #include "BasicEntities.hpp"
 #include "CommonDataEntities.hpp"
+#include "../Helpers/CollectionIterators.hpp"
 #include "../Interfaces/IPerks.hpp"
 
-typedef std::unordered_set<std::unique_ptr<IPerk>> perk_set;
+constexpr int MIN_GUILD_LEVEL = 1;
+constexpr int MAX_GUILD_LEVEL = 10;
+constexpr int DEFAULT_GUILD_QUEST_RARITY = 5;
+constexpr int DEFAULT_GUILD_GOLD_COUNT = 2000;
+constexpr int DEFAULT_GUILD_FAME_COUNT = 100;
 
 class Guild : public IdNameEntity
 {
 public:
-	Guild(std::string& new_name, GoldFameData& new_base_stats, int new_difficulty)
-		: IdNameEntity(new_name, auto_id++), base_stats(new_base_stats), difficulty(new_difficulty) { }
+	Guild(std::string& new_name, GoldFameData& new_base_stats)
+		: IdNameEntity(new_name, auto_id++), base_stats(new_base_stats) { }
 	~Guild() = default;
 
 	GoldFameData base_stats;
-	GetSetEntity<int> max_quest_rarity = GetSetEntity<int>(5);
+	GetSetEntity<int> max_quest_rarity = GetSetEntity<int>(DEFAULT_GUILD_QUEST_RARITY);
 	
-	int get_difficulty() const { return difficulty.get_value(); }
-	int set_difficulty(int value) { difficulty.set_value(std::clamp(value, 1, 10)); return difficulty.get_value(); }
-
-	int get_level() const { return std::clamp(1 + base_stats.fame.get_value() / 1000, 1, 10); }
+	int get_prestige_level() const { return std::clamp(1 + base_stats.fame.get_value() / 1000, MIN_GUILD_LEVEL, MAX_GUILD_LEVEL); }
 	
 	perk_set& get_perks() { return perks; }
 	perk_set& set_perks(std::unique_ptr<IPerk>&& new_perk) { perks.insert(std::move(new_perk)); return perks; }
+	void reset_progress()
+	{
+		perks.clear();
+		base_stats.gold.set_value(DEFAULT_GUILD_GOLD_COUNT);
+		base_stats.fame.set_value(DEFAULT_GUILD_FAME_COUNT);
+		max_quest_rarity.set_value(DEFAULT_GUILD_QUEST_RARITY);
+	}
 
+	void add_new_perk(std::unique_ptr<IPerk>&& new_perk) { perks.insert(std::move(new_perk)); }
+
+	IPerk* find_perk(int perk_id) const { return CollectionIterators::find(perks, perk_id); }
 protected:
 	inline static int auto_id = 0;
-	GetSetEntity<int> difficulty = GetSetEntity<int>(1);
 	perk_set perks {};
 };
 

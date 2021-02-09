@@ -36,6 +36,7 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildInfoCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildRenameCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, GuildWaitCommand>>());
 		
 		// Adventurer
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerCommand>>());
@@ -98,7 +99,7 @@ class GameManager
 public:
 	void force_menu()
 	{
-		std::vector<std::string> body  { "menu" };
+		std::vector<std::string> body  { "menu", "start" };
 		auto menu = command_manager.create_command(body);
 		ConsoleProcessors::clean_and_print(menu->execute(game_data));
 	}

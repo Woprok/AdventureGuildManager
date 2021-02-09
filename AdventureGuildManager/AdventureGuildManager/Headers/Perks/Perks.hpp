@@ -3,13 +3,24 @@
 
 #include "../Interfaces/IPerks.hpp"
 
+constexpr int GODSLAYER_ID = 0;
+constexpr int TRADE_FAME_PERK = 0;
+constexpr int REQUALIFICATION_COURSE_PERK = 1;
+constexpr int ARMORY_PERK = 2;
+constexpr int CHURCH_OF_HEROES_PERK = 3;
+constexpr int MADNESS_OF_MASTER_PERK = 4;
+constexpr int SHARED_EXPERIENCE_PERK = 5;
+constexpr int RETIREMENT_SAVINGS_PERK = 6;
+constexpr int DANGEROUS_EXPEDITION_PERK = 7;
+constexpr int LEGENDARY_HEROES_PERK = 8;
+
 /// <summary>
 /// Reduce fame and increase gold.
 /// </summary>
 class TradeFame : public IPerk
 {
 public:
-	TradeFame() : IPerk("Rough Job", 0, 
+	TradeFame() : IPerk("Rough Job", TRADE_FAME_PERK,
 		"Sacrifice fame for gold.", 2) { }
 	~TradeFame() override = default;
 };
@@ -19,7 +30,7 @@ public:
 class RequalificationCourse : public IPerk
 {
 public:
-	RequalificationCourse() : IPerk("Requalification Course", 1,
+	RequalificationCourse() : IPerk("Requalification Course", REQUALIFICATION_COURSE_PERK,
 		"Trader provided us with manual of many things.", 4) { }
 	~RequalificationCourse() override = default;
 };
@@ -29,7 +40,7 @@ public:
 class Armory : public IPerk
 {
 public:
-	Armory() : IPerk("Armory", 2,
+	Armory() : IPerk("Armory", ARMORY_PERK,
 		"Some heroes are born genius, other are equipped with many artifacts.", 6) { }
 	~Armory() override = default;
 };
@@ -39,7 +50,7 @@ public:
 class ChurchOfHeroes : public IPerk
 {
 public:
-	ChurchOfHeroes() : IPerk("Foundation of religion", 3,
+	ChurchOfHeroes() : IPerk("Foundation of religion", CHURCH_OF_HEROES_PERK,
 		"Did somebody said we can't bring back corpses ?", 8) { }
 	~ChurchOfHeroes() override = default;
 };
@@ -49,7 +60,7 @@ public:
 class MadnessOfMaster : public IPerk
 {
 public:
-	MadnessOfMaster() : IPerk("Master and guide to hypemaster", 4,
+	MadnessOfMaster() : IPerk("Master and guide to hypemaster", MADNESS_OF_MASTER_PERK,
 		"Certainly something good will come from this?", 10) { }
 	~MadnessOfMaster() override = default;
 };
@@ -60,7 +71,7 @@ public:
 class SharedExperience : public IPerk
 {
 public:
-	SharedExperience() : IPerk("Veterans", 5, 
+	SharedExperience() : IPerk("Veterans", SHARED_EXPERIENCE_PERK,
 		"One tip can save life or improve growth.", 3) { }
 //	void execute_quest_perk(Reward& reward, Penalty& penalty) override
 //	{
@@ -77,7 +88,7 @@ private:
 class RetirementSavings : public IPerk
 {
 public:
-	RetirementSavings() : IPerk("Retirement fund", 6,
+	RetirementSavings() : IPerk("Retirement fund", RETIREMENT_SAVINGS_PERK,
 		"More money for guild is always better.", 5) { }
 };
 /// <summary>
@@ -86,7 +97,7 @@ public:
 class DangerousExpeditions : public IPerk
 {
 public:
-	DangerousExpeditions() : IPerk("Dangerous Expeditions", 7,
+	DangerousExpeditions() : IPerk("Dangerous Expeditions", DANGEROUS_EXPEDITION_PERK,
 		"You said we can't go ? Well let's go.", 7) { }
 	//	void execute_quest_perk(Reward& reward, Penalty& penalty) override
 	//	{
@@ -101,7 +112,7 @@ public:
 class LegendaryHeroes : public IPerk
 {
 public:
-	LegendaryHeroes() : IPerk("Legendary Heroes", 8,
+	LegendaryHeroes() : IPerk("Legendary Heroes", LEGENDARY_HEROES_PERK,
 		"Bard do your job or you will be thrown to jail.", 9) { }
 	//	void execute_quest_perk(Reward& reward, Penalty& penalty) override
 	//	{

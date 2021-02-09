@@ -8,10 +8,25 @@
 #include <string>
 #include <vector>
 
+/// <summary>
+/// Generates numbers from min_value to max_value included.
+/// </summary>
+class UniformGenerator final
+{
+public:
+	UniformGenerator(int min_value, int max_value) : distribution(0, max_value) { }
+	int get_next() const { return distribution(rng); }
+protected:
+	std::uniform_int_distribution<unsigned> distribution;
+	inline static std::mt19937 rng{ std::random_device{}() };
+};
+
 class NameGenerator
 {
 public:
-	std::string get_from(std::vector<std::string> collection)
+	NameGenerator() = default;
+	virtual ~NameGenerator() = default;
+	std::string get_random_item(const std::vector<std::string>& collection) const
 	{
 		std::vector<std::string> result;
 		std::sample(collection.begin(), 
@@ -22,44 +37,32 @@ public:
 		return result[0];
 	}
 	
-	std::string create_person_name()
+	std::string create_person_name() const
 	{
-		return get_from(pos1) + get_from(pos2) + get_from(pos3);
-	}
-	std::string create_quest_name()
-	{
-		return get_from(qst1) + " " + get_from(qst2) + " " + get_from(qst3);
+		return get_random_item(name_start) + get_random_item(name_middle) + get_random_item(name_end);
 	}
 private:
-	std::vector<std::string> pos1 = {
+	const std::vector<std::string> name_start = {
 		"A", "Be", "De", "El", "Fa",
 		"Jo", "Ki", "La", "Ma", "Na",
 		"O", "Pa", "Re", "Si", "Ta",
 		"Va"
 	};
-	std::vector<std::string> pos2 = {
+	const std::vector<std::string> name_middle = {
 		"bar", "ched", "dell", "far", "gran",
 		"hal", "jen", "kel", "lim", "mor",
 		"net", "penn", "quil", "rond", "sark",
 		"shen", "tur", "vash", "yor", "zen"
 	};
-	std::vector<std::string> pos3 = {
+	const std::vector<std::string> name_end = {
 		"a", "ac", "ai", "al", "am",
 		"an", "ar", "ea", "el", "er",
 		"ess", "ett", "ik", "id", "il",
 		"in", "is", "or", "us"
 	};
-	std::vector<std::string> qst1 = {
-		"Search", "Find", "Kill", "Assasinate", "Protect"
-	};
-	std::vector<std::string> qst2 = {
-		"the", "a"
-	};
-	std::vector<std::string> qst3 = {
-		"Mountains", "Hills", "Monster", "Merchant"
-	};
 };
 
+/*/
 class ChanceGenerator
 {
 public:
@@ -85,5 +88,6 @@ private:
 	std::unique_ptr<std::mt19937> gen;
 	std::uniform_int_distribution<unsigned> distrib;
 };
+/**/
 
 #endif

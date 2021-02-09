@@ -9,6 +9,9 @@
 #include "BasicEntities.hpp"
 #include "CommonDataEntities.hpp"
 
+constexpr int MIN_QUEST_DIFFICULTY = 1;
+constexpr int MAX_QUEST_DIFFICULTY = 10;
+
 enum class QuestRarity
 {
 	Common = 0,
@@ -46,6 +49,7 @@ enum class QuestType
 	Mimes = 14,
 };
 
+typedef std::vector<QuestRarity> quest_rarity_vector;
 typedef std::unordered_set<QuestType> quest_type_set;
 
 class Quest : public IdNameEntity
@@ -68,7 +72,7 @@ public:
 	GetSetEntity<QuestStateEnum> state;
 	
 	int get_difficulty() const { return difficulty.get_value(); }
-	int set_difficulty(int value) { difficulty.set_value(std::clamp(value, 1, 10)); return difficulty.get_value(); }
+	int set_difficulty(int value) { difficulty.set_value(std::clamp(value, MIN_QUEST_DIFFICULTY, MAX_QUEST_DIFFICULTY)); return difficulty.get_value(); }
 
 	quest_type_set& get_quest_types() { return types; }
 	quest_type_set& set_quest_types(QuestType new_value) { types.insert(new_value); return types; }
