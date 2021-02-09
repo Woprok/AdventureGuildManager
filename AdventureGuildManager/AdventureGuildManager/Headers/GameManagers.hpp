@@ -103,7 +103,22 @@ public:
 		auto menu = command_manager.create_command(body);
 		ConsoleProcessors::clean_and_print(menu->execute(game_data));
 	}
-	
+
+	void force_win_screen()
+	{
+		std::ostringstream win_screen;
+		
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "Your guild reached moon. Well not exactly, but you are most famous guild in world.\n";
+		win_screen << "Well that's lie. You are only guild in world, there was no real competition to begin with.\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		ConsoleProcessors::clean_and_print(win_screen.str());
+	}
+
 	void run_game()
 	{
 		while (!game_data.game_state->is_exit_requested())
@@ -113,6 +128,11 @@ public:
 			auto cmd_cmd = command_manager.create_command(cmd);
 			auto rs = cmd_cmd->execute(game_data);
 			ConsoleProcessors::print_interface(rs);
+
+			if (game_data.win_condition())
+			{
+				force_win_screen();
+			}
 		}
 	}
 private:

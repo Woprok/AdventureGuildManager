@@ -1,5 +1,10 @@
 ﻿#include "../Headers/GameDataManagers.hpp"
 
+bool GameDataManager::win_condition() const
+{
+	return guild->get_prestige_level() == MAX_GUILD_LEVEL;
+}
+
 /// <summary>
 /// Basically you need gold, so there is only one way to get gold at start...
 /// Due to this we can say that any setting can be done before.

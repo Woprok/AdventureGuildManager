@@ -117,6 +117,7 @@ public:
 	/// This literally does everything the game is about.
 	/// </summary>
 	bool dispatch(const int adventurer_id, const int quest_id);
+	bool win_condition() const;
 protected:
 	/// <summary>
 	/// Clear current game state.
