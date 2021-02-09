@@ -9,6 +9,7 @@
 
 #include "../Helpers/EntityCreators.hpp"
 #include "../Interfaces/ISkills.hpp"
+#include "../Skills/QuestTypeCounterSkills.hpp"
 #include "../Skills/Skills.hpp"
 
 typedef ParameterEntityCreator<ISkill> SkillCreator;
@@ -51,21 +52,28 @@ protected:
 
 	void fill_skill_creator()
 	{
+		skill_creators[0] = std::make_unique<FullSkillCreator<Godslayer>>(0);
 		skill_creators[1] = std::make_unique<FullSkillCreator<Lucky>>(1);
-		skill_creators[2] = std::make_unique<FullSkillCreator<Lucky>>(2);
-		skill_creators[3] = std::make_unique<FullSkillCreator<Lucky>>(3);
-		skill_creators[4] = std::make_unique<FullSkillCreator<Lucky>>(4);
-		skill_creators[5] = std::make_unique<FullSkillCreator<Lucky>>(5);
-		skill_creators[100] = std::make_unique<FullSkillCreator<Lucky>>(100);
-		skill_creators[101] = std::make_unique<FullSkillCreator<Lucky>>(101);
-		skill_creators[102] = std::make_unique<FullSkillCreator<Lucky>>(102);
-		skill_creators[103] = std::make_unique<FullSkillCreator<Lucky>>(103);
-		skill_creators[104] = std::make_unique<FullSkillCreator<Lucky>>(104);
-		skill_creators[105] = std::make_unique<FullSkillCreator<Lucky>>(105);
-		skill_creators[106] = std::make_unique<FullSkillCreator<Lucky>>(106);
-		skill_creators[107] = std::make_unique<FullSkillCreator<Lucky>>(107);
-		skill_creators[108] = std::make_unique<FullSkillCreator<Lucky>>(108);
-		skill_creators[109] = std::make_unique<FullSkillCreator<Lucky>>(109);
+		skill_creators[2] = std::make_unique<FullSkillCreator<GoldHoarder>>(2);
+		skill_creators[3] = std::make_unique<FullSkillCreator<Entertainer>>(3);
+		skill_creators[4] = std::make_unique<FullSkillCreator<EscapeArtist>>(4);
+		skill_creators[5] = std::make_unique<FullSkillCreator<Noble>>(5);
+		skill_creators[100] = std::make_unique<FullSkillCreator<Barbarian>>(100);
+		skill_creators[101] = std::make_unique<FullSkillCreator<Assassin>>(101);
+		skill_creators[102] = std::make_unique<FullSkillCreator<Mage>>(102);
+		skill_creators[103] = std::make_unique<FullSkillCreator<Healer>>(103);
+		skill_creators[104] = std::make_unique<FullSkillCreator<Paladin>>(104);
+		skill_creators[105] = std::make_unique<FullSkillCreator<Shaman>>(105);
+		skill_creators[106] = std::make_unique<FullSkillCreator<Fighter>>(106);
+		skill_creators[107] = std::make_unique<FullSkillCreator<Lightbearer>>(107);
+		skill_creators[108] = std::make_unique<FullSkillCreator<SurvivalExpert>>(108);
+		skill_creators[109] = std::make_unique<FullSkillCreator<Woodcutter>>(109);
+		skill_creators[110] = std::make_unique<FullSkillCreator<Digger>>(110);
+		skill_creators[111] = std::make_unique<FullSkillCreator<Pyromaniac>>(111);
+		skill_creators[112] = std::make_unique<FullSkillCreator<Bard>>(112);
+		skill_creators[113] = std::make_unique<FullSkillCreator<Troll>>(113);
+		skill_creators[114] = std::make_unique<FullSkillCreator<Warlock>>(114);
+		skill_creators[115] = std::make_unique<FullSkillCreator<Clown>>(115);
 	}
 
 	void finalize_skill_instances()

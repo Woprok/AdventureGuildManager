@@ -2,16 +2,18 @@
 #define GAME_MANAGERS_HPP
 
 #include "Helpers/ConsoleProcessors.hpp"
+#include "Helpers/EntityCreators.hpp"
 #include "Interfaces/ICommands.hpp"
-#include "UserCommands/AdventurerCommands.hpp"
 #include "UserCommands/DebugCommands.hpp"
-#include "UserCommands/EncyclopediaCommands.hpp"
-#include "UserCommands/ErrorCommands.hpp"
+#include "UserCommands/MenuCommands.hpp"
+#include "UserCommands/HelpCommands.hpp"
 #include "UserCommands/ExitCommands.hpp"
 #include "UserCommands/GuildCommands.hpp"
-#include "UserCommands/HelpCommands.hpp"
-#include "UserCommands/MenuCommands.hpp"
+#include "UserCommands/AdventurerCommands.hpp"
 #include "UserCommands/QuestCommands.hpp"
+#include "UserCommands/EncyclopediaCommands.hpp"
+#include "UserCommands/PerkCommands.hpp"
+#include "UserCommands/ErrorCommands.hpp"
 
 class CommandManager
 {
@@ -41,6 +43,7 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerHiredCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerDeadCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerInactiveCommand>>());
+		
 		// Adventurer Actions
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerRecruitCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, AdventurerPensionCommand>>());
@@ -51,6 +54,7 @@ public:
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestReservedCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestCompletedCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestFailedCommand>>());
+		
 		// Quest Actions
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestTakeCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, QuestDispatchCommand>>());
@@ -58,8 +62,20 @@ public:
 		// Encyclopedia
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaCommand>>());
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaQuestTypesCommand>>());
-		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaSkillTypessCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaQuestRaritiesCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaAdventurerRaritiesCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaSkillsCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, EncyclopediaPerksCommand>>());
 
+		// Perks
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkTradeFameCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkRequalificationCourseCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkArmoryCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkChurchOfHeroesCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkMadnessOfMasterCommand>>());
+		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, PerkBuyCommand>>());
+		
 		// Fallback, should be kept last while we keep them in the list
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, ErrorCommand>>());
 	}
@@ -89,7 +105,7 @@ public:
 	
 	void run_game()
 	{
-		while (!game_data.game_state.is_exit_requested())
+		while (!game_data.game_state->is_exit_requested())
 		{
 			auto cmd = ConsoleProcessors::get_next_command();
 			ConsoleProcessors::print_debug(cmd);

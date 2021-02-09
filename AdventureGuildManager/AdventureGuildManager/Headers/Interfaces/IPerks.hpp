@@ -12,6 +12,7 @@ public:
 		: IdNameEntity(new_name, new_id), description(new_description), level_requirement(new_level_requirement) {}
 	~IPerk() = default;
 	GetSetEntity<int> level_requirement;
+	const std::string& get_description() const { return description; }
 protected:
 	std::string description;
 };

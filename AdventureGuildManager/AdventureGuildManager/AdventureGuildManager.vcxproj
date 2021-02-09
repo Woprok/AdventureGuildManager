@@ -36,6 +36,7 @@
     <ClInclude Include="Headers\Keepers\QuestTypeKeeper.hpp" />
     <ClInclude Include="Headers\Keepers\QuestKeepers.hpp" />
     <ClInclude Include="Headers\Keepers\SkillKeepers.hpp" />
+    <ClInclude Include="Headers\Skills\QuestTypeCounterSkills.hpp" />
     <ClInclude Include="Headers\UserCommands\AdventurerCommands.hpp" />
     <ClInclude Include="Headers\Interfaces\ICommands.hpp" />
     <ClInclude Include="Headers\Helpers\ConsoleHelpers.hpp" />
@@ -67,6 +68,7 @@
     <ClInclude Include="Headers\UserInterfaces\QuestInterfaces.hpp" />
     <ClInclude Include="Headers\Entities\QuestEntities.hpp" />
     <ClInclude Include="Headers\Skills\Skills.hpp" />
+    <ClInclude Include="Headers\UserInterfaces\SharedConvertors.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

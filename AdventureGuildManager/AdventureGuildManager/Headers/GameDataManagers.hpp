@@ -3,8 +3,12 @@
 
 #include <memory>
 
+
+#include "Entities/AdventurerEntities.hpp"
 #include "Entities/GameStates.hpp"
 #include "Entities/GuildEntitiess.hpp"
+#include "Helpers/CollectionIterators.hpp"
+#include "Skills/Skills.hpp"
 
 
 class GameDataManager
@@ -41,6 +45,113 @@ public:
 	private:
 		GuildInterfaces interface;
 	};*/
+
+	bool trade(GameData& game_data, int fame_to_convert)
+	{
+		const int fame_conversion_rate = 10;
+		if (game_data.current_guild.check_perk())
+		{
+			// block negative and insufficient fame funds
+			if (fame_to_convert > 0 && game_data.current_guild.get_fame() >= fame_to_convert)
+			{
+				// Substract fame and add gold
+				game_data.current_guild.rmv_fame(fame_to_convert);
+				game_data.current_guild.add_gold(fame_to_convert * fame_conversion_rate);
+				return true;
+			}
+		}
+		return false;
+	}
+	bool retrain(GameData& game_data, int adventurer_id)
+	{
+		const int retrain_per_skill = 250;
+		if (game_data.current_guild.check_perk())
+		{
+			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
+			const int adventurer_skill_count = adventurer->get_skills().size();
+			const int retrain_cost = adventurer_skill_count * retrain_per_skill;
+			if (adventurer != nullptr && game_data.current_guild.get_gold() >= retrain_cost)
+			{
+				// Substract retrain cost
+				game_data.current_guild.rmv_gold(retrain_cost);
+				// retrain is remove and add (chance that some skill stay is completely fine)
+				adventurer->rmv_skill(adventurer_skill_count);
+				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(adventurer_skill_count, adventurer->get_skills()));
+				return true;
+			}
+		}
+		return false;
+	}
+	bool upgrade(GameData& game_data, int adventurer_id)
+	{
+		const int upgrade_cost_per_level = 250;
+		if (game_data.current_guild.check_perk())
+		{
+			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
+			const int upgrade_cost = get_cost_multiplayer(adventurer->get_rarity()) * upgrade_cost_per_level;
+			if (adventurer != nullptr && game_data.current_guild.get_gold() >= upgrade_cost)
+			{
+				// Substract upgrade cost
+				game_data.current_guild.rmv_gold(upgrade_cost);
+				// upgrade
+				const int skill_gain = get_skill_gain(adventurer->get_rarity());
+				adventurer->set_rarity(AdventurerRarity::DungeonMaster);
+				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(skill_gain, adventurer->get_skills()));
+				return true;
+			}
+		}
+		return false;
+	}
+	int get_cost_multiplayer(AdventurerRarity rarity) const
+	{
+		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, 10);
+	}
+	int get_skill_gain(AdventurerRarity rarity) const
+	{
+		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, INT32_MAX);
+	}
+	bool resurrect(GameData& game_data, int adventurer_id)
+	{
+		const int ressurection_cost = 1000;
+		if (game_data.current_guild.check_perk())
+		{
+			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_dead(), adventurer_id);
+			const int revive_cost = adventurer->get_level_recruitment_cost() + ressurection_cost;
+			if (adventurer != nullptr && game_data.current_guild.get_gold() >= revive_cost)
+			{
+				// Substract revive cost
+				game_data.current_guild.rmv_gold(revive_cost);
+				// resurrect
+				return game_data.adventurers.revive(adventurer_id);
+			}
+		}
+		return false;
+	}
+	bool buy_perk(GameData& game_data, int perk_id)
+	{
+		const int ressurection_cost = 1000;
+		if (game_data.current_guild.check_perk())
+		{
+
+		}
+		return false;
+	}
+	bool grant_godslayer(GameData& game_data, int adventurer_id)
+	{
+		const int ressurection_cost = 1000;
+		if (game_data.current_guild.check_perk())
+		{
+			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
+			if (adventurer != nullptr)
+			{
+				// Grant skill
+				adventurer->set_skills(std::make_unique<Godslayer>(1000));
+				// Remove option ??? note in perk ??? TODO
+				return true;
+			}
+		}
+		return false;
+	}
 };
 /*/
 #include <string>

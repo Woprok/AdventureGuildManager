@@ -2,6 +2,7 @@
 #define ADVENTURER_INTERFACES_HPP
 
 #include "InputInterfaces.hpp"
+#include "SharedConvertors.hpp"
 #include "../Entities/AdventurerEntities.hpp"
 #include "../Interfaces/IDisplayableInterfaces.hpp"
 
@@ -24,7 +25,7 @@ public:
 		return result_stream.str();
 	}
 
-	std::string display_available(GameDataManager& game_data_manager) const
+	std::string display_available(GameDataManager& game_data_manager)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -32,7 +33,7 @@ public:
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_available());
 		return result_stream.str();
 	}
-	std::string display_hired(GameDataManager& game_data_manager) const
+	std::string display_hired(GameDataManager& game_data_manager)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -40,7 +41,7 @@ public:
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_hired());
 		return result_stream.str();
 	}
-	std::string display_dead(GameDataManager& game_data_manager) const
+	std::string display_dead(GameDataManager& game_data_manager)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -48,7 +49,7 @@ public:
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_dead());
 		return result_stream.str();
 	}
-	std::string display_inactive(GameDataManager& game_data_manager) const
+	std::string display_inactive(GameDataManager& game_data_manager)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -57,7 +58,7 @@ public:
 		return result_stream.str();
 	}
 	
-	std::string display_adventurer_hired(GameDataManager& game_data_manager, int adventurer_id) const
+	std::string display_adventurer_hired(GameDataManager& game_data_manager, int adventurer_id)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board receptionist!*****" << "\n";
@@ -65,7 +66,7 @@ public:
 		result_stream << find_adventurer_detail(game_data_manager, adventurer_id);
 		return result_stream.str();
 	}
-	std::string display_adventurer_retired(GameDataManager& game_data_manager, int adventurer_id) const
+	std::string display_adventurer_retired(GameDataManager& game_data_manager, int adventurer_id)
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board receptionist!*****" << "\n";
@@ -91,7 +92,7 @@ public:
 	{
 		return InputInterfaces::get_num(cs, "adventurer id");
 	}
-private:
+protected:
 	std::string list_adventurers(GameDataManager& game_data_manager, const adventurer_collection& collection)
 	{
 		std::ostringstream result;
@@ -102,19 +103,6 @@ private:
 		return result.str();
 	}
 
-	std::string join_rarity(AdventurerRarity rarity)
-	{
-		switch (rarity)
-		{
-			case AdventurerRarity::Commoner: return "Commoner";
-			case AdventurerRarity::Adventurer: return "Adventurer";
-			case AdventurerRarity::Hero: return "Hero";
-			case AdventurerRarity::Innkeeper: return "Innkeeper";
-			case AdventurerRarity::God: return "God";
-			case AdventurerRarity::DungeonMaster: return "DungeonMaster";
-			default: return "Undefined";
-		}
-	}
 	std::string join_level(int level) const
 	{
 		return std::to_string(level);
@@ -151,7 +139,7 @@ private:
 	{
 		std::ostringstream result_stream;
 		result_stream << "\t" << adventurer.get_id() << " - " << adventurer.get_name() << "\n";
-		result_stream << "\t\t" << "- rarity: " << join_rarity(adventurer.rarity.get_value()) << "\n";
+		result_stream << "\t\t" << "- rarity: " << SharedConvertors::translate_adventurer_rarity(adventurer.rarity.get_value()) << "\n";
 		result_stream << "\t\t" << "- level: " << join_level(adventurer.get_level()) << "\n";
 		result_stream << "\t\t" << "- experience: " << join_experience(adventurer.experience.get_value()) << "\n";
 		result_stream << "\t\t" << "- recruit cost: "

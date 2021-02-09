@@ -1,6 +1,7 @@
 ﻿#ifndef QUEST_INTERFACES_HPP
 #define QUEST_INTERFACES_HPP
 
+#include "SharedConvertors.hpp"
 #include "../Entities/QuestEntities.hpp"
 
 class QuestInterfaces : public IDisplayeableInterfaces
@@ -117,52 +118,7 @@ private:
 		return result.str();
 	}
 
-	std::string join_state(QuestStateEnum quest_state) const
-	{
-		switch (quest_state)
-		{
-			case QuestStateEnum::Success: return "Success";
-			case QuestStateEnum::Failure: return "Failure";
-			case QuestStateEnum::Undefined: return "Ignored";
-			default: return "Undefined";
-		}
-	}
-	std::string join_rarity(QuestRarity quest_rarity) const
-	{
-		switch (quest_rarity)
-		{
-			case QuestRarity::Common: return "Common";
-			case QuestRarity::Uncommon: return "Uncommon";
-			case QuestRarity::Rare: return "Rare";
-			case QuestRarity::Epic: return "Epic";
-			case QuestRarity::War: return "War";
-			case QuestRarity::Legendary: return "Legendary";
-			case QuestRarity::Campaign: return "Campaign";
-			case QuestRarity::Special: return "Special";
-			default: return "Undefined";
-		}
-	}
-	std::string join_types(QuestType quest_type) const
-	{
-		switch (quest_type)
-		{
-			case QuestType::Minions: return "Minions";
-			case QuestType::Boss: return "Boss";
-			case QuestType::Poison: return "Poison";
-			case QuestType::Bleeding: return "Bleeding";
-			case QuestType::Curse: return "Curse";
-			case QuestType::Elfs: return "Elfs";
-			case QuestType::Dwarfs: return "Dwarfs";
-			case QuestType::Fairies: return "Fairies";
-			case QuestType::Magical: return "Magical";
-			case QuestType::Darkness: return "Darkness";
-			case QuestType::Wilderness: return "Wilderness";
-			case QuestType::Dankness: return "Darkness";
-			case QuestType::Memes: return "Memes";
-			case QuestType::Mimes: return "Mimes";
-			default: return "Undefined";
-		}
-	}
+
 	std::string join_difficulty(int difficulty) const
 	{
 		return std::to_string(difficulty);
@@ -172,7 +128,7 @@ private:
 		std::unordered_set<std::string> list_of_types;
 		for (auto && type : quest_types)
 		{
-			list_of_types.insert(join_types(type));
+			list_of_types.insert(SharedConvertors::translate_quest_type(type));
 		}
 		return StringContext::merge(list_of_types, ", ");
 	}
@@ -202,8 +158,8 @@ private:
 	{
 		std::ostringstream result_stream;
 		result_stream << "\t" << quest.get_id() << " - " << quest.get_name() << "\n";
-		result_stream << "\t\t" << "- state: " << join_state(quest.state.get_value()) << "\n";
-		result_stream << "\t\t" << "- rarity: " << join_rarity(quest.rarity.get_value()) << "\n";
+		result_stream << "\t\t" << "- state: " << SharedConvertors::translate_state(quest.state.get_value()) << "\n";
+		result_stream << "\t\t" << "- rarity: " << SharedConvertors::translate_quest_rarity(quest.rarity.get_value()) << "\n";
 		result_stream << "\t\t" << "- difficulty: " << join_difficulty(quest.get_difficulty()) << "\n";
 		result_stream << "\t\t" << "- quest types: " << join_quest_types(quest.get_quest_types()) << "\n";
 		result_stream << "\t\t" << "- adventurer: " << join_adventurer(game_data_manager, quest.adventurer.get_value()) << "\n";
@@ -226,46 +182,4 @@ private:
 			: "You have failed this quest with your adventurer.\n" + quest_detail(game_data_manager, quest);
 	}
 };
-
-/*/
-class QuestTypeWrapper : public NamedEntity
-{
-public:
-	QuestTypeWrapper(QuestType type, std::string type_name, std::string type_desc) : NamedEntity(type_name), desc(type_desc), self(type) { }
-	const std::string& get_description() const { return desc; }
-	QuestType get_self() const { return self; }
-	bool operator==(const QuestTypeWrapper& qtw) const { return qtw.self == self; }
-	size_t operator()(const QuestTypeWrapper& qtw) const { return static_cast<size_t>(qtw.self); }
-private:
-	std::string desc;
-	QuestType self;
-};
-
-namespace std
-{
-	template<> struct hash<QuestTypeWrapper>
-	{
-		std::size_t operator()(QuestTypeWrapper const& s) const noexcept
-		{
-			return static_cast<size_t>(s.get_self());
-		}
-	};
-}
-const std::unordered_set<QuestTypeWrapper>& get_quest_types() const { return quest_type_definitions; }
-std::unordered_set<QuestTypeWrapper> quest_type_definitions;
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Minions, "Minions", "Multiple enemies."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Boss, "Boss", "Big guy."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Poison, "Poison", "Danger of poison is guaranteed."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Bleeding, "Bleeding", "You will bleed out quite fast."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Curse, "Curse", "You will end harmed on this quest in many ways."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Elfs, "Elfs", "See dwarfs."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Dwarfs, "Dwarfs", "See elfs."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Fairies, "Fairies", "Little jokers."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Magical, "Magical", "Atla is alive."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Darkness, "Darkness", "Why did you not bring torch ?"));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Wilderness, "Wilderness", "Location is filled with primordial beings."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Dankness, "Dankness", "Dank."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Memes, "Memes", "Dark side of internet."));
-quest_type_definitions.insert(QuestTypeWrapper(QuestType::Mimes, "Mimes", "Annoying."));
-/**/
 #endif

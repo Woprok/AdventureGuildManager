@@ -1,267 +1,171 @@
 ﻿#ifndef PERK_COMMANDS_HPP
 #define PERK_COMMANDS_HPP
 
+#include "../Interfaces/ICommands.hpp"
+#include "../UserInterfaces/PerkInterfaces.hpp"
+
 class PerkCommand : public ICommand
 {
 public:
 	PerkCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() == 1
 			&& (command_context[0] == "perk" || command_context[0] == "p");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		return interface.to_string();
+		return interface.display_default();
 	}
 private:
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
-class PerkTradeFameToGoldCommand : public ICommand
+class PerkTradeFameCommand : public ICommand
 {
 public:
-	PerkTradeFameToGoldCommand(string_context& command_context) : ICommand(command_context) { }
+	PerkTradeFameCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkTradeFameCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "trade" || command_context[0] == "-t");
+			&& (command_context[0] == "trade_fame" || command_context[0] == "-t");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int fame_to_convert = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int fame_amount = interface.get_fame_value(context.size() == 3 ? context[2] : "");
 
-		if (trade(game_data, fame_to_convert))
+		if (game_data_manager.trade(game_data_manager, fame_amount))
 		{
 
 		}
-		return interface.to_string();
+		return interface.display_trade_action_failed(fame_amount);
 	}
 private:
-	bool trade(GameData& game_data, int fame_to_convert)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-			// block negative and insufficient fame funds
-			if (fame_to_convert > 0 && game_data.current_guild.get_fame() >= fame_to_convert)
-			{
-				// Substract fame and add gold
-				game_data.current_guild.rmv_fame(fame_to_convert);
-				game_data.current_guild.add_gold(fame_to_convert * fame_conversion_rate);
-				return true;
-			}
-		}
-		return false;
-	}
-	const int fame_conversion_rate = 10;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
-class PerkRetrainAdventurerCommand : public ICommand
+class PerkRequalificationCourseCommand : public ICommand
 {
 public:
-	PerkRetrainAdventurerCommand(string_context& command_context) : ICommand(command_context) { }
+	PerkRequalificationCourseCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkRequalificationCourseCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "retrain" || command_context[0] == "-ret");
+			&& (command_context[0] == "requalification_course" || command_context[0] == "-r");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int adventurer_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (retrain(game_data, adventurer_id))
+		if (game_data_manager.retrain(game_data_manager, adventurer_id))
 		{
-
+			return interface.display_armory(game_data_manager, adventurer_id);
 		}
-		return interface.to_string();
+		return interface.display_adventurer_action_failed(adventurer_id);
 	}
 private:
-	bool retrain(GameData& game_data, int adventurer_id)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			const int adventurer_skill_count = adventurer->get_skills().size();
-			const int retrain_cost = adventurer_skill_count * retrain_per_skill;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= retrain_cost)
-			{
-				// Substract retrain cost
-				game_data.current_guild.rmv_gold(retrain_cost);
-				// retrain is remove and add (chance that some skill stay is completely fine)
-				adventurer->rmv_skill(adventurer_skill_count);
-				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(adventurer_skill_count, adventurer->get_skills()));
-				return true;
-			}
-		}
-		return false;
-	}
-	const int retrain_per_skill = 250;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
-class PerkUpgradeAdventurerRarityCommand : public ICommand
+class PerkArmoryCommand : public ICommand
 {
 public:
-	PerkUpgradeAdventurerRarityCommand(string_context& command_context) : ICommand(command_context) { }
+	PerkArmoryCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkArmoryCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "upgrade" || command_context[0] == "-u");
+			&& (command_context[0] == "armory" || command_context[0] == "-a");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int adventurer_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (upgrade(game_data, adventurer_id))
+		if (game_data_manager.upgrade(game_data_manager, adventurer_id))
 		{
-
+			return interface.display_armory(game_data_manager, adventurer_id);
 		}
-		return interface.to_string();
+		return interface.display_adventurer_action_failed(adventurer_id);
 	}
 private:
-	bool upgrade(GameData& game_data, int adventurer_id)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			const int upgrade_cost = get_cost_multiplayer(adventurer->get_rarity()) * upgrade_cost_per_level;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= upgrade_cost)
-			{
-				// Substract upgrade cost
-				game_data.current_guild.rmv_gold(upgrade_cost);
-				// upgrade
-				const int skill_gain = get_skill_gain(adventurer->get_rarity());
-				adventurer->set_rarity(AdventurerRarity::DungeonMaster);
-				adventurer->set_skills(game_data.encyclopedia.generate_from_rarity(skill_gain, adventurer->get_skills()));
-				return true;
-			}
-		}
-		return false;
-	}
-	int get_cost_multiplayer(AdventurerRarity rarity) const
-	{
-		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, 10);
-	}
-	int get_skill_gain(AdventurerRarity rarity) const
-	{
-		return std::clamp(static_cast<int>(AdventurerRarity::DungeonMaster) - static_cast<int>(rarity), 0, INT32_MAX);
-	}
-	const int upgrade_cost_per_level = 250;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
-class PerkResurrectAdventurerCommand : public ICommand
+class PerkChurchOfHeroesCommand : public ICommand
 {
 public:
-	PerkResurrectAdventurerCommand(string_context& command_context) : ICommand(command_context) { }
+	PerkChurchOfHeroesCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkChurchOfHeroesCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "resurrect" || command_context[0] == "-res");
+			&& (command_context[0] == "church_of_heroes" || command_context[0] == "-c");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int adventurer_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (resurrect(game_data, adventurer_id))
+		if (game_data_manager.resurrect(game_data_manager, adventurer_id))
 		{
-
+			return interface.display_church_of_heroes(game_data_manager, adventurer_id);
 		}
-		return interface.to_string();
+		return interface.display_adventurer_action_failed(adventurer_id);
 	}
 private:
-	bool resurrect(GameData& game_data, int adventurer_id)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_dead(), adventurer_id);
-			const int revive_cost = adventurer->get_level_recruitment_cost() + ressurection_cost;
-			if (adventurer != nullptr && game_data.current_guild.get_gold() >= revive_cost)
-			{
-				// Substract revive cost
-				game_data.current_guild.rmv_gold(revive_cost);
-				// resurrect
-				return game_data.adventurers.revive(adventurer_id);
-			}
-		}
-		return false;
-	}
-	const int ressurection_cost = 1000;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
 
-class PerkGrantGodslayerCommand : public ICommand
+class PerkMadnessOfMasterCommand : public ICommand
 {
 public:
-	PerkGrantGodslayerCommand(string_context& command_context) : ICommand(command_context) { }
+	PerkMadnessOfMasterCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkMadnessOfMasterCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "grant" || command_context[0] == "-g");
+			&& (command_context[0] == "madness_of_master" || command_context[0] == "-m");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int adventurer_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (grant_godslayer(game_data, adventurer_id))
+		if (game_data_manager.grant_godslayer(game_data_manager, adventurer_id))
 		{
-
+			return interface.display_madness_of_master(game_data_manager, adventurer_id);
 		}
-		return interface.to_string();
+		return interface.display_adventurer_action_failed(adventurer_id);
 	}
 private:
-	bool grant_godslayer(GameData& game_data, int adventurer_id)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-			const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), adventurer_id);
-			if (adventurer != nullptr)
-			{
-				// Grant skill
-				adventurer->set_skills(std::make_unique<Godslayer>(1000));
-				// Remove option ??? note in perk ??? TODO
-				return true;
-			}
-		}
-		return false;
-	}
-	const int ressurection_cost = 1000;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
 
 class PerkBuyCommand : public ICommand
 {
 public:
 	PerkBuyCommand(string_context& command_context) : ICommand(command_context) { }
+	~PerkBuyCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
 			&& (command_context[0] == "buy" || command_context[0] == "-b");
 	}
-	std::string execute(GameData& game_data) override
+	std::string execute(GameDataManager& game_data_manager) override
 	{
-		int perk_id = InputInterface::get_id(context.size() == 3 ? context[2] : "");
+		int perk_id = interface.get_perk_id_value(context.size() == 3 ? context[2] : "");
 
-		if (buy_perk(game_data, perk_id))
+		if (game_data_manager.buy_perk(game_data_manager, perk_id))
 		{
 
 		}
-		return interface.to_string();
+		return interface.display_perk_action_failed(perk_id);
 	}
 private:
-	bool buy_perk(GameData& game_data, int perk_id)
-	{
-		if (game_data.current_guild.check_perk())
-		{
-
-		}
-		return false;
-	}
-	const int ressurection_cost = 1000;
-	PerkInterface interface;
+	PerkInterfaces interface;
 };
 
 #endif

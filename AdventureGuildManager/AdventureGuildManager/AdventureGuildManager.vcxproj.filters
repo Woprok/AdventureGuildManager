@@ -155,5 +155,11 @@
     <ClInclude Include="Headers\Keepers\QuestTypeKeeper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\UserInterfaces\SharedConvertors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Skills\QuestTypeCounterSkills.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

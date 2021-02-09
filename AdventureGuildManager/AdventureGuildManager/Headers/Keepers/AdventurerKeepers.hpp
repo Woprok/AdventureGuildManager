@@ -2,7 +2,10 @@
 #define ADVENTURER_KEEPERS_HPP
 #include <memory>
 
+
+#include "../Entities/AdventurerEntities.hpp"
 #include "../Helpers/CollectionIterators.hpp"
+#include "../Helpers/Generators.hpp"
 
 class AdventurerKeeper
 {
