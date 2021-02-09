@@ -2,7 +2,11 @@
 #define QUEST_TYPE_COUNTER_SKILLS_HPP
 
 #include "../Entities/QuestEntities.hpp"
+#include "../Generators/NeutralGenerators.hpp"
 #include "../Interfaces/ISkills.hpp"
+
+constexpr int MIN_GEN_VALUE = 1;
+constexpr int MAX_GEN_VALUE = 100;
 
 class QuestTypeCounterSkill : public ISkill
 {
@@ -10,16 +14,16 @@ public:
 	QuestTypeCounterSkill(std::string&& new_name, int new_id, std::string&& new_description, QuestType counter_type)
 		: ISkill(std::move(new_name), new_id, std::move(new_description)), quest_type(counter_type) {}
 	~QuestTypeCounterSkill() override = default;
-	void execute_skill() override
+	void execute_roll_result_change(const quest_type_set& types, bool& result) override
 	{
-		//ChanceGenerator chance;
-		//if (quest.has_quest_type(get_counter()))
-		//{
-		//	result = result || chance.get_chance() > 75;
-		//}
+		if (types.contains(quest_type))
+		{
+			result = result || chance.get_next() > 75;
+		}
 	}
 private:
 	QuestType quest_type;
+	static inline UniformGenerator chance{ MIN_GEN_VALUE, MAX_GEN_VALUE };
 };
 
 class Barbarian : public QuestTypeCounterSkill

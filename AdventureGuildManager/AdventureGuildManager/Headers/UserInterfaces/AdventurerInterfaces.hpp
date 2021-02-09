@@ -20,8 +20,8 @@ public:
 		result_stream << "\t- adventurer hired: show hired adventurers.\n";
 		result_stream << "\t- adventurer dead: show dead adventurers.\n";
 		result_stream << "\t- adventurer inactive: show retired adventurers.\n";
-		result_stream << "\t- adventurer recruit \"adventurer id\": transfers available quest to reserved quests.\n";
-		result_stream << "\t- adventurer pension \"adventurer id\" \"quest id\": dispatches adventure on quest.\n";
+		result_stream << "\t- adventurer recruit \"adventurer id\": transfers available adventurer to hired. Full level based recruitment cost is paid.\n";
+		result_stream << "\t- adventurer pension \"adventurer id\" \"quest id\": retires adventure. Full level based retirement cost is paid. Fame is gained.\n";
 		return result_stream.str();
 	}
 
@@ -30,7 +30,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
 		result_stream << "Available adventurers for hiring:" << "\n";
-		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_available());
+		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_available());
 		return result_stream.str();
 	}
 	std::string display_hired(GameDataManager& game_data_manager)
@@ -38,7 +38,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
 		result_stream << "Hired adventurers:" << "\n";
-		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_hired());
+		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_hired());
 		return result_stream.str();
 	}
 	std::string display_dead(GameDataManager& game_data_manager)
@@ -46,7 +46,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
 		result_stream << "Killed in action adventurers:" << "\n";
-		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_dead());
+		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_dead());
 		return result_stream.str();
 	}
 	std::string display_inactive(GameDataManager& game_data_manager)
@@ -54,7 +54,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
 		result_stream << "Retired adventurers:" << "\n";
-		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers.get_inactive());
+		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_inactive());
 		return result_stream.str();
 	}
 	
@@ -112,7 +112,7 @@ protected:
 		std::unordered_set<std::string> list_of_types;
 		for (auto&& quest_id : quests)
 		{
-			const auto&& quest = game_data_manager.quests.get_quest(quest_id);
+			const auto&& quest = game_data_manager.quests->find_quest(quest_id);
 			list_of_types.insert(quest->get_name());
 		}
 		return StringContext::merge(list_of_types, ", ");
@@ -156,7 +156,7 @@ protected:
 
 	std::string find_adventurer_detail(GameDataManager& game_data_manager, int adventurer_id)
 	{
-		return adventurer_detail(game_data_manager, game_data_manager.adventurers.get_adventurer(adventurer_id));
+		return adventurer_detail(game_data_manager, *game_data_manager.adventurers->find_adventurer(adventurer_id));
 	}
 };
 

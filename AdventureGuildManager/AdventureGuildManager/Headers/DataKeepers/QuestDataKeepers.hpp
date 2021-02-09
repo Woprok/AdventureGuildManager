@@ -38,6 +38,17 @@ public:
 	Quest* find_reserved(int quest_id) const { return CollectionIterators::find(reserved, quest_id); }
 	Quest* find_completed(int quest_id) const { return CollectionIterators::find(completed, quest_id); }
 	Quest* find_failed(int quest_id) const { return CollectionIterators::find(failed, quest_id); }
+	Quest* find_quest(int quest_id) const
+	{
+		auto result = CollectionIterators::find(failed, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(completed, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(reserved, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(available, quest_id);
+		return result;
+	}
 protected:
 	quest_type_set quest_types;
 	quest_rarity_vector quest_rarities;

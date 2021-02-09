@@ -16,7 +16,7 @@ public:
 	ChangeEntity<int> fame;
 };
 
-class GoldFameDeadlyData : GoldFameData
+class GoldFameDeadlyData : public GoldFameData
 {
 public:
 	GoldFameDeadlyData(int new_gold, int new_fame, bool is_deadly)

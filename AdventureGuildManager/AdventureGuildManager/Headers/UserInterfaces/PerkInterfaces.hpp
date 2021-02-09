@@ -17,12 +17,32 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "Perk Commands:\n";
 		result_stream << "\t- perk: help for perk commands.\n";
-		result_stream << "\t- perk trade_fame \"fame amount\": trade fame for gold.\n";
-		result_stream << "\t- perk requalification_course \"hired adventurer id\": randomize adventurer skills.\n";
-		result_stream << "\t- perk armory \"hired adventurer id\": upgrade adventurer rarity.\n";
-		result_stream << "\t- perk church_of_heroes \"dead adventurer id\": revive dead adventurer.\n";
-		result_stream << "\t- perk madness_of_master \"hired adventurer id\": upgrade adventurer.\n";
-		result_stream << "\t- perk buy \"perk id\": buy perk.\n";
+		result_stream << "\t- perk trade_fame \"fame amount\": trade fame for gold. "
+			<< "Ratio is 1:"
+			<< DEFAULT_FAME_TO_GOLD_RATE
+			<< "."
+			<< "\n";
+		result_stream << "\t- perk requalification_course \"hired adventurer id\": randomize adventurer skills. "
+			<< "For each of his skill you pay: "
+			<< DEFAULT_RETRAIN_COST_PER_SKILL
+			<<"."
+			<< "\n";
+		result_stream << "\t- perk armory \"hired adventurer id\": upgrade adventurer rarity. "
+			<< "Can be upgraded from commoner up to innkeeper. Cost is rarity difference * " << DEFAULT_UPGRADE_COST_PER_RARITY_DIFF
+			<< "."
+			<< "\n";
+		result_stream << "\t- perk church_of_heroes \"dead adventurer id\": revive dead adventurer. "
+			<< "Amount of gold required is: level recruit cost + " << DEFAULT_RESSURECTION_COST
+			<< "."
+			<< "\n";
+		result_stream << "\t- perk madness_of_master \"hired adventurer id\": upgrade adventurer. "
+			<< "Cost is: " << DEFAULT_GODSLAYER_COST
+			<< " fame."
+			<< "\n";
+		result_stream << "\t- perk buy \"perk id\": buy perk."
+			<< "You need to have prestige level equal to perk level. Cost is equal to perk level * " << DEFAULT_COST_PER_LEVEL_PERK
+			<< "."
+			<< "\n";
 		return result_stream.str();
 	}
 

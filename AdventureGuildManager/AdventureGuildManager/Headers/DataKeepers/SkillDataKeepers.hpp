@@ -69,6 +69,7 @@ protected:
 		skill_creators[3] = std::make_unique<FullSkillCreator<Entertainer>>(3);
 		skill_creators[4] = std::make_unique<FullSkillCreator<EscapeArtist>>(4);
 		skill_creators[5] = std::make_unique<FullSkillCreator<Noble>>(5);
+		skill_creators[6] = std::make_unique<FullSkillCreator<Saviour>>(6);
 		skill_creators[100] = std::make_unique<FullSkillCreator<Barbarian>>(100);
 		skill_creators[101] = std::make_unique<FullSkillCreator<Assassin>>(101);
 		skill_creators[102] = std::make_unique<FullSkillCreator<Mage>>(102);

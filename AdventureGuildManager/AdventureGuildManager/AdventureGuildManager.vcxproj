@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\AdventureGuildManager.cpp" />
+    <ClCompile Include="Sources\GameDataManagerDispatch.cpp" />
     <ClCompile Include="Sources\GameDataManagers.cpp" />
   </ItemGroup>
   <ItemGroup>

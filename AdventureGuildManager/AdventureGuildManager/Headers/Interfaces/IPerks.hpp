@@ -13,29 +13,15 @@ public:
 	~IPerk() = default;
 	GetSetEntity<int> level_requirement;
 	const std::string& get_description() const { return description; }
+	virtual void execute_reward_change(GoldFameData& data, int& experience) {}
+	virtual void execute_penalty_change(GoldFameDeadlyData& data, int& experience) {}
+	virtual void execute_wait_change(int& expenses_total) {}
+	virtual void execute_retirement_change(int& retirement_total, int& retirement_fame) {}
+	virtual void execute_gain_change(GoldFameData& data, int& max_quest_rarity) {}
 protected:
 	std::string description;
 };
 
 typedef std::unordered_set<std::unique_ptr<IPerk>> perk_set;
-/*/
-class GuildPerk
-{
-public:
-	GuildPerk(int level_restriction, int perk_id) : guild_level_required(level_restriction), guild_perk_id(perk_id) {}
-	virtual ~GuildPerk() = default;
-	virtual bool fulfill_requirements(GameData& game_data)
-	{
-		return game_data.current_guild.get_level() >= guild_level_required;
-	}
-	virtual void execute_guild_perk(Guild& guild) {}
-	virtual void execute_quest_perk(Reward& reward, Penalty& penalty) {}
-	int get_perk_id() { return guild_perk_id; }
-private:
-	const int guild_level_required;
-	const int guild_perk_id;
-};
-/**/
-
 
 #endif

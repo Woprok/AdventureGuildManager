@@ -26,6 +26,14 @@ void GameDataManager::wait_turn()
 	GameDataManager::progress_game();
 }
 
+void alter_wait_change(perk_set& perks, int& total_sum)
+{
+	for (auto&& item : perks)
+	{
+		item->execute_wait_change(total_sum);
+	}
+}
+
 void GameDataManager::substract_quest_wait_fees()
 {
 	const int quest_completed = quests->get_completed().size();
@@ -34,8 +42,11 @@ void GameDataManager::substract_quest_wait_fees()
 	fee_multiplicator = std::clamp(fee_multiplicator,0.5, 1.5);
 	
 	const int quest_reserved = quests->get_reserved().size();
+	int sum = (quest_reserved * DEFAULT_QUEST_RESERVATION_GOLD_RENT) * fee_multiplicator;
 	
-	guild->base_stats.gold.rmv_value((quest_reserved * DEFAULT_QUEST_RESERVATION_GOLD_RENT) * fee_multiplicator);
+	alter_wait_change(guild->get_perks(), sum);
+	
+	guild->base_stats.gold.rmv_value(sum);
 	
 }
 void GameDataManager::substract_adventurer_wait_fees()
@@ -45,7 +56,8 @@ void GameDataManager::substract_adventurer_wait_fees()
 	{
 		pay_cost += adventurer->living_cost.get_value();
 	}
-
+	alter_wait_change(guild->get_perks(), pay_cost);
+	
 	guild->base_stats.gold.rmv_value(pay_cost);
 }
 
@@ -95,7 +107,7 @@ void GameDataManager::reset_game()
 	guild->reset_progress();
 }
 
-bool GameDataManager::rename_guild(const std::string&& new_guild_name)
+bool GameDataManager::rename_guild(const std::string& new_guild_name) const
 {
 	if (new_guild_name.empty())
 		return false;
@@ -128,15 +140,26 @@ bool GameDataManager::hire_adventurer(const int adventurer_id)
 	return false;
 }
 
+void alter_retirement_change(perk_set& perks, int& total_sum, int& total_fame)
+{
+	for (auto&& item : perks)
+	{
+		item->execute_retirement_change(total_sum, total_fame);
+	}
+}
+
 bool GameDataManager::pension_adventurer(const int adventurer_id)
 {
 	const auto adventurer = adventurers->find_hired(adventurer_id);
-
-	if (adventurer != nullptr && guild->base_stats.gold.get_value() >= adventurer->get_level_retire_cost())
+	int retire_cost = adventurer->get_level_retire_cost();
+	int retire_fame = adventurer->get_level_retire_fame();
+	alter_retirement_change(guild->get_perks(), retire_cost, retire_fame);
+	
+	if (adventurer != nullptr && guild->base_stats.gold.get_value() >= retire_cost)
 	{
 		// Substract retirement cost
-		guild->base_stats.gold.rmv_value(adventurer->get_level_retire_cost());
-		guild->base_stats.fame.add_value(adventurer->get_level_retire_fame());
+		guild->base_stats.gold.rmv_value(retire_cost);
+		guild->base_stats.fame.add_value(retire_fame);
 
 		return adventurers->pension(adventurer_id);
 	}
@@ -250,17 +273,30 @@ bool GameDataManager::grant_godslayer(int adventurer_id)
 	return false;
 }
 
+void alter_guild_stats(Guild* guild)
+{
+	int change_rarity = guild->max_quest_rarity.get_value();
+
+	for (auto&& item : guild->get_perks())
+	{
+		item->execute_gain_change(guild->base_stats, change_rarity);
+	}
+	guild->max_quest_rarity.set_value(change_rarity);
+}
+
 bool GameDataManager::buy_perk(int perk_id)
 {
-	const auto perk = guild->find_perk(perk_id);
-	if (perk != nullptr)
+	if (guild->find_perk(perk_id) != nullptr)
 		return false;
-	const int perk_cost = DEFAULT_COST_PER_LEVEL_PERK * ;
-	if (guild->base_stats.gold.get_value() >= perk_cost)
+	auto&& created_perk = perks->create_perk(perk_id);
+	const int perk_cost = DEFAULT_COST_PER_LEVEL_PERK * created_perk->level_requirement.get_value();
+	if (guild->base_stats.gold.get_value() >= perk_cost && guild->get_prestige_level() >= created_perk->level_requirement.get_value())
 	{
 		// Substract slayer cost
 		guild->base_stats.gold.rmv_value(perk_cost);
-
+		guild->set_perks(std::move(created_perk));
+				
+		alter_guild_stats(guild.get());
 		return true;
 	}
 	return false;

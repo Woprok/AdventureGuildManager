@@ -88,7 +88,7 @@ public:
 	{
 		if (!game_data_manager.game_state->get_progress_state())
 		{
-			const int new_difficulty = interface.get_difficulty_value(context.size() == 3 ? context[2] : "");
+			int new_difficulty = interface.get_difficulty_value(context.size() == 3 ? context[2] : "");
 			new_difficulty = game_data_manager.change_difficulty(new_difficulty);
 			return interface.display_difficulty(new_difficulty);
 		}

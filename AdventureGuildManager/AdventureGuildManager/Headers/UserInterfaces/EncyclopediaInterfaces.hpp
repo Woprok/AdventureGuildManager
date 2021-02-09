@@ -1,5 +1,6 @@
 ﻿#ifndef ENCYCLOPEDIA_INTERFACES_HPP
 #define ENCYCLOPEDIA_INTERFACES_HPP
+#include "SharedConvertors.hpp"
 #include "../Entities/QuestEntities.hpp"
 
 class EncyclopediaInterfaces : public IDisplayeableInterfaces
@@ -62,36 +63,37 @@ public:
 		return result_stream.str();
 	}
 private:
-	std::string quest_type_detail(QuestType item)
+	std::string quest_type_detail(QuestType item) const
 	{
 		return "\t" + std::to_string(static_cast<int>(item)) + " - " + SharedConvertors::translate_quest_type(item) + "\n"
-			+ "\t\t" + SharedConvertors::translate_quest_type_description() + "\n";
+			+ "\t\t" + SharedConvertors::translate_quest_type_description(item) + "\n";
 	}
-	std::string quest_rarities_detail(QuestRarity item)
+	std::string quest_rarities_detail(QuestRarity item) const
 	{
 		return "\t" + std::to_string(static_cast<int>(item)) + " - " + SharedConvertors::translate_quest_rarity(item) + "\n"
-			+ "\t\t" + SharedConvertors::translate_quest_rarity_description() + "\n";
+			+ "\t\t" + SharedConvertors::translate_quest_rarity_description(item) + "\n";
 	}
-	std::string adventurer_rarities_detail(AdventurerRarity item)
+	std::string adventurer_rarities_detail(AdventurerRarity item) const
 	{
 		return "\t" + std::to_string(static_cast<int>(item)) + " - " + SharedConvertors::translate_adventurer_rarity(item) + "\n"
-			+ "\t\t" + SharedConvertors::translate_adventurer_rarity_description() + "\n";
+			+ "\t\t" + SharedConvertors::translate_adventurer_rarity_description(item) + "\n";
 	}
-	std::string skill_detail(const std::unique_ptr<ISkill>& item)
+	std::string skill_detail(const std::unique_ptr<ISkill>& item) const
 	{
 		return "\t" + std::to_string(item->get_id()) + " - " + item->get_name() + "\n"
 			+ "\t\t" + item->get_description() + "\n";
 	}
-	std::string perk_detail(const std::unique_ptr<IPerk>& item)
+	std::string perk_detail(const std::unique_ptr<IPerk>& item) const
 	{
 		return "\t" + std::to_string(item->get_id()) + " - " + item->get_name() + "\n"
+			 + "\t\t" + "Prestige requirement level & perk level: " + std::to_string(item->level_requirement.get_value()) + "\n"
 			 + "\t\t" + item->get_description() + "\n";
 	}
 	
 	std::string list_quest_types(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : collection)
+		for (auto&& item : game_data_manager.quests->get_quest_types())
 		{
 			result << quest_type_detail(item);
 		}
@@ -100,7 +102,7 @@ private:
 	std::string list_quest_rarities(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : collection)
+		for (auto&& item : game_data_manager.quests->get_quest_rarities())
 		{
 			result << quest_rarities_detail(item);
 		}
@@ -109,7 +111,7 @@ private:
 	std::string list_adventurer_rarities(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : collection)
+		for (auto&& item : game_data_manager.adventurers->get_adventurer_rarities())
 		{
 			result << adventurer_rarities_detail(item);
 		}
@@ -118,7 +120,7 @@ private:
 	std::string list_skills(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : collection)
+		for (auto&& item : game_data_manager.skills->get_defined_skills())
 		{
 			result << skill_detail(item);
 		}
@@ -127,7 +129,7 @@ private:
 	std::string list_perks(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : collection)
+		for (auto&& item : game_data_manager.perks->get_defined_perks())
 		{
 			result << perk_detail(item);
 		}

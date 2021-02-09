@@ -17,6 +17,21 @@ public:
 			default: return "Undefined";
 		}
 	}
+	static std::string translate_quest_rarity(int quest_rarity)
+	{
+		switch (quest_rarity)
+		{
+		case static_cast<int>(QuestRarity::Common): return "Common";
+		case static_cast<int>(QuestRarity::Uncommon): return "Uncommon";
+		case static_cast<int>(QuestRarity::Rare): return "Rare";
+		case static_cast<int>(QuestRarity::Epic): return "Epic";
+		case static_cast<int>(QuestRarity::War): return "War";
+		case static_cast<int>(QuestRarity::Legendary): return "Legendary";
+		case static_cast<int>(QuestRarity::Campaign): return "Campaign";
+		case static_cast<int>(QuestRarity::Special): return "Special";
+		default: return "Undefined";
+		}
+	}
 	static std::string translate_quest_rarity(QuestRarity quest_rarity)
 	{
 		switch (quest_rarity)
@@ -106,12 +121,12 @@ public:
 	{
 		switch (rarity)
 		{
-			case AdventurerRarity::Commoner: return "Recruiting young folks is like hiring meat shield.";
-			case AdventurerRarity::Adventurer: return "This guy already survived his first goblin.";
-			case AdventurerRarity::Hero: return "Why all heroes wear shiny armors?";
-			case AdventurerRarity::Innkeeper: return "Seriously do not engage this one.";
-			case AdventurerRarity::God: return "How did god become adventurer ?";
-			case AdventurerRarity::DungeonMaster: return "Rock falls, you die.";
+			case AdventurerRarity::Commoner: return "Recruiting young folks is like hiring meat shield. No skill.";
+			case AdventurerRarity::Adventurer: return "This guy already survived his first goblin. Single skill";
+			case AdventurerRarity::Hero: return "Why all heroes wear shiny armors? Two skills just from armor ?";
+			case AdventurerRarity::Innkeeper: return "Seriously do not engage this one. How did he acquire 3 skills ?";
+			case AdventurerRarity::God: return "How did god become adventurer ? And with 5 skills ?";
+			case AdventurerRarity::DungeonMaster: return "Rock falls, you die. He certainly cheats with his 10 skills.";
 			default: return "Undefined";
 		}
 	}

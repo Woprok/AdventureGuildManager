@@ -18,8 +18,8 @@ public:
 		result_stream << "\t- quest reserved: show reserved quests.\n";
 		result_stream << "\t- quest completed: show completed quests.\n";
 		result_stream << "\t- quest failed: show failed quests.\n";
-		result_stream << "\t- quest take \"quest id\": transfers available quest to reserved quests.\n";
-		result_stream << "\t- quest dispatch \"adventurer id\" \"quest id\": dispatches adventure on quest.\n";
+		result_stream << "\t- quest take \"quest id\": transfers available quest to reserved quests. Foreach quest in reserve you pay around " << DEFAULT_QUEST_RESERVATION_GOLD_RENT <<"gold.\n";
+		result_stream << "\t- quest dispatch \"adventurer id\" \"quest id\": dispatches adventure on quest. Adventurer living expenses are paid.\n";
 		return result_stream.str();
 	}
 	
@@ -28,7 +28,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board!*****" << "\n";
 		result_stream << "Available quests for taking:" << "\n";
-		result_stream << list_quests(game_data_manager, game_data_manager.quests.get_available());
+		result_stream << list_quests(game_data_manager, game_data_manager.quests->get_available());
 		return result_stream.str();
 	}
 	std::string display_reserved(GameDataManager& game_data_manager) const
@@ -36,7 +36,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board!*****" << "\n";
 		result_stream << "Reserved quests for adventurers:" << "\n";
-		result_stream << list_quests(game_data_manager, game_data_manager.quests.get_reserved());
+		result_stream << list_quests(game_data_manager, game_data_manager.quests->get_reserved());
 		return result_stream.str();
 	}
 	std::string display_completed(GameDataManager& game_data_manager) const
@@ -44,7 +44,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board!*****" << "\n";
 		result_stream << "Completed quest by adventurers:" << "\n";
-		result_stream << list_quests(game_data_manager, game_data_manager.quests.get_completed());
+		result_stream << list_quests(game_data_manager, game_data_manager.quests->get_completed());
 		return result_stream.str();
 	}
 	std::string display_failed(GameDataManager& game_data_manager) const
@@ -52,7 +52,7 @@ public:
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board!*****" << "\n";
 		result_stream << "Failed quests by adventurers:" << "\n";
-		result_stream << list_quests(game_data_manager, game_data_manager.quests.get_failed());
+		result_stream << list_quests(game_data_manager, game_data_manager.quests->get_failed());
 		return result_stream.str();
 	}
 
@@ -74,7 +74,7 @@ public:
 		return result_stream.str();
 	}
 
-	std::string display_quest_reservation_failed(int quest_id)
+	std::string display_quest_reservation_failed(int quest_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board receptionist!*****" << "\n";
@@ -86,7 +86,7 @@ public:
 		result_stream << "\n";
 		return result_stream.str();
 	}
-	std::string display_quest_dispatch_failed(int adventurer_id, int quest_id)
+	std::string display_quest_dispatch_failed(int adventurer_id, int quest_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Quest board receptionist!*****" << "\n";
@@ -108,7 +108,7 @@ public:
 		return InputInterfaces::get_num(cs, "quest id");
 	}
 private:
-	std::string list_quests(GameDataManager& game_data_manager, const quest_collection& collection)
+	std::string list_quests(GameDataManager& game_data_manager, const quest_collection& collection) const
 	{
 		std::ostringstream result;
 		for (auto&& quest : collection)
@@ -134,8 +134,8 @@ private:
 	}
 	std::string join_adventurer(GameDataManager& game_data_manager, int adventurer_id) const
 	{
-		const auto&& adventurer = game_data_manager.adventurers.get_adventurer(adventurer_id);
-		return adventurer != nullptr ? adventurer.get_name() : "No attempt recorded.";
+		const auto&& adventurer = game_data_manager.adventurers->find_adventurer(adventurer_id);
+		return adventurer != nullptr ? adventurer->get_name() : "No attempt recorded.";
 	}
 	std::string join_reward(GoldFameData& reward) const
 	{
@@ -168,18 +168,18 @@ private:
 		return result_stream.str();
 	}
 
-	std::string quest_reservation_detail(GameDataManager& game_data_manager, int quest_id)
+	std::string quest_reservation_detail(GameDataManager& game_data_manager, int quest_id) const
 	{
-		return quest_detail(game_data_manager, game_data_manager.quests.get_quest(quest_id));
+		return quest_detail(game_data_manager, *game_data_manager.quests->find_quest(quest_id));
 	}
 	
-	std::string quest_dispatch_detail(GameDataManager& game_data_manager, int quest_id)
+	std::string quest_dispatch_detail(GameDataManager& game_data_manager, int quest_id) const
 	{
-		const auto&& quest = game_data_manager.quests.get_quest(quest_id);
+		const auto&& quest = game_data_manager.quests->find_quest(quest_id);
 		
-		return (quest.state.get_value() == QuestStateEnum::Success)
-			? "You have completed this quest with your adventurer.\n" + quest_detail(game_data_manager, quest)
-			: "You have failed this quest with your adventurer.\n" + quest_detail(game_data_manager, quest);
+		return (quest->state.get_value() == QuestStateEnum::Success)
+			? "You have completed this quest with your adventurer.\n" + quest_detail(game_data_manager, *quest)
+			: "You have failed this quest with your adventurer.\n" + quest_detail(game_data_manager, *quest);
 	}
 };
 #endif

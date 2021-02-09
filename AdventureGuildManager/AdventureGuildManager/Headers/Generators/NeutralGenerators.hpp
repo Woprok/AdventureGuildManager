@@ -62,32 +62,4 @@ private:
 	};
 };
 
-/*/
-class ChanceGenerator
-{
-public:
-	ChanceGenerator(int minimumValue = 1, int maximumValue = 100) : distrib(minimumValue, maximumValue)
-	{
-		seed = rd() ^ (
-			static_cast<std::mt19937::result_type>(std::chrono::duration_cast<std::chrono::seconds>(
-					std::chrono::system_clock::now().time_since_epoch())
-				.count()) +
-			static_cast<std::mt19937::result_type>(std::chrono::duration_cast<std::chrono::microseconds>(
-					std::chrono::high_resolution_clock::now().time_since_epoch())
-				.count()));
-		
-		gen = std::move(std::make_unique<std::mt19937>(seed));
-	}
-	unsigned long long get_chance() const
-	{
-		return distrib(*gen);
-	}
-private:
-	std::random_device rd;
-	std::mt19937::result_type seed;
-	std::unique_ptr<std::mt19937> gen;
-	std::uniform_int_distribution<unsigned> distrib;
-};
-/**/
-
 #endif

@@ -36,7 +36,7 @@ public:
 	{
 		int fame_amount = interface.get_fame_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.trade(game_data_manager, fame_amount))
+		if (game_data_manager.trade(fame_amount))
 		{
 
 		}
@@ -60,7 +60,7 @@ public:
 	{
 		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.retrain(game_data_manager, adventurer_id))
+		if (game_data_manager.retrain(adventurer_id))
 		{
 			return interface.display_armory(game_data_manager, adventurer_id);
 		}
@@ -84,7 +84,7 @@ public:
 	{
 		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.upgrade(game_data_manager, adventurer_id))
+		if (game_data_manager.upgrade(adventurer_id))
 		{
 			return interface.display_armory(game_data_manager, adventurer_id);
 		}
@@ -108,7 +108,7 @@ public:
 	{
 		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.resurrect(game_data_manager, adventurer_id))
+		if (game_data_manager.resurrect(adventurer_id))
 		{
 			return interface.display_church_of_heroes(game_data_manager, adventurer_id);
 		}
@@ -133,7 +133,7 @@ public:
 	{
 		int adventurer_id = interface.get_adventurer_id_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.grant_godslayer(game_data_manager, adventurer_id))
+		if (game_data_manager.grant_godslayer(adventurer_id))
 		{
 			return interface.display_madness_of_master(game_data_manager, adventurer_id);
 		}
@@ -158,7 +158,7 @@ public:
 	{
 		int perk_id = interface.get_perk_id_value(context.size() == 3 ? context[2] : "");
 
-		if (game_data_manager.buy_perk(game_data_manager, perk_id))
+		if (game_data_manager.buy_perk(perk_id))
 		{
 
 		}

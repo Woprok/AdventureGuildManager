@@ -1,5 +1,5 @@
-﻿#ifndef SKILL_DATA_KEEPERS_HPP
-#define SKILL_DATA_KEEPERS_HPP
+﻿#ifndef PERK_DATA_KEEPERS_HPP
+#define PERK_DATA_KEEPERS_HPP
 
 #include <iterator>
 #include <memory>
@@ -38,7 +38,7 @@ public:
 		throw("PerkDataKeeper does not contain fallback type.");
 	}
 
-	const perk_set& get_defined_skills() const { return perk_instances; }
+	const perk_set& get_defined_perks() const { return perk_instances; }
 protected:
 	std::unordered_map<int, VirtualPerkCreator> perk_creators{};
 	perk_set perk_instances{};
@@ -60,7 +60,7 @@ protected:
 	{
 		for (auto&& perk_creator : perk_creators)
 		{
-			perk_instances.insert(std::move(perk_creator->create_entity()));
+			perk_instances.insert(std::move(perk_creator.second->create_entity()));
 		}
 	}
 };

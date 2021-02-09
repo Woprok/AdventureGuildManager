@@ -35,6 +35,17 @@ public:
 	Adventurer* find_hired(int adventurer_id) const { return CollectionIterators::find(hired, adventurer_id); }
 	Adventurer* find_retired(int adventurer_id) const { return CollectionIterators::find(inactive, adventurer_id); }
 	Adventurer* find_dead(int adventurer_id) const { return CollectionIterators::find(dead, adventurer_id); }
+	Adventurer* find_adventurer(int quest_id) const
+	{
+		auto result = CollectionIterators::find(inactive, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(dead, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(hired, quest_id);
+		if (result == nullptr)
+			result = CollectionIterators::find(available, quest_id);
+		return result;
+	}
 protected:
 	adventurer_rarity_vector adventurer_rarities;
 	adventurer_collection available;
