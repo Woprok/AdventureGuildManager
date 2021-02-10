@@ -36,12 +36,18 @@ public:
 		result_stream << "No game in progress! You can start game by using \"menu start\"." << "\n";
 		return result_stream.str();
 	}
-	std::string display_end() const
+	std::string display_end(GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventure Guild Manager!*****" << "\n";
 		result_stream << "Game was ended!" << "\n";
 		result_stream << "You will have to start new game by using \"menu start\"." << "\n";
+		result_stream << "Your final stats:" << "\n";
+		result_stream << "\t" << "Quest completed: " << game_data_manager.quests->get_completed().size() << "\n";
+		result_stream << "\t" << "Quest failed: " << game_data_manager.quests->get_failed().size() << "\n";
+		result_stream << "\t" << "Adventurer retired: " << game_data_manager.adventurers->get_inactive().size() << "\n";
+		result_stream << "\t" << "Adventurer killed: " << game_data_manager.adventurers->get_dead().size() << "\n";
+		result_stream << "\t" << "And much more could be shown..." << "\n";
 		return result_stream.str();
 	}
 	std::string display_start() const

@@ -127,6 +127,7 @@ public:
 	/// </summary>
 	bool dispatch(const int adventurer_id, const int quest_id);
 	bool win_condition() const;
+	bool lose_condition() const;
 protected:
 	/// <summary>
 	/// Clear current game state.

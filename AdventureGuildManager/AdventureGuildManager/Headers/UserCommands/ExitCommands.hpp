@@ -22,7 +22,7 @@ public:
 	{
 		game_data_manager.game_state->request_exit(true);
 		
-		return interfaces.display_exit(game_data_manager);
+		return interfaces.display_exit();
 	}
 private:
 	ExitInterfaces interfaces;

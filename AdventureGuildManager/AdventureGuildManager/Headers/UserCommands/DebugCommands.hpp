@@ -10,42 +10,29 @@ public:
 	~DebugCommand() override = default;
 	static bool can_derive_from(string_context& command_context)
 	{
-		return command_context.size() == 1
+		return command_context.size() >= 1
 			&& command_context[0] == "debug";
 	}
 	std::string execute([[maybe_unused]] GameDataManager& game_data_manager) override
 	{
-		return "Runtime debugging command completed!\n";
-	}
-/*
-private:
-	void debug_level_up_down(GameData& game_data)
-	{
-		const auto adventurer = CollectionIterators::find(game_data.adventurers.get_hired(), 1);
-		auto old_lvl = adventurer->get_level();
-		adventurer->add_experience(-10000);
-		auto new_lvl = adventurer->get_level();
-		game_data.resolve_level(adventurer, old_lvl, new_lvl);
-	}
-	void debug_rarity_quest(GameData& game_data)
-	{
-		auto&& types = game_data.encyclopedia.generate_from_rarity(QuestRarity::War);
-		for (auto&& type : types)
+		if (context.size() >= 2)
 		{
-			std::cout << static_cast<int>(type) << "\n";
+			if (context[1] == "more")
+			{
+				game_data_manager.guild->base_stats.gold.add_value(10000);
+				game_data_manager.guild->base_stats.fame.add_value(1000);
+				return "You have more gold and fame now!\n";
+			}
+
+			if (context[1] == "less")
+			{
+				game_data_manager.guild->base_stats.gold.rmv_value(10000);
+				game_data_manager.guild->base_stats.fame.rmv_value(1000);
+				return "You have less gold and fame now!\n";
+			}
 		}
+		return "Debug can be used as debug more or debug less!\n";
 	}
-	void debug_rarity_adventurer(GameData& game_data)
-	{
-		skill_collection collection;
-		collection.insert(std::make_unique<Hoarder>(1));
-		auto&& types = game_data.encyclopedia.generate_from_rarity(static_cast<int>(AdventurerRarity::Innkeeper), collection);
-		for (auto&& type : types)
-		{
-			std::cout << type->get_name() << "\n";
-		}
-	}
-*/
 };
 
 #endif

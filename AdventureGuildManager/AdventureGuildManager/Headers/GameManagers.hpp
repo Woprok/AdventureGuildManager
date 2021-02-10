@@ -21,7 +21,9 @@ public:
 	CommandManager()
 	{
 		// Debug Commands
+#if _DEBUG
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, DebugCommand>>());
+#endif
 		
 		// Generic
 		command_creators.push_back(std::make_unique<ContextEntityCreator<ICommand, MenuCommand>>());
@@ -120,7 +122,27 @@ public:
 		win_screen << "****************************************\n";
 		win_screen << "****************************************\n";
 		win_screen << "****************************************\n";
-		ConsoleProcessors::clean_and_print(win_screen.str());
+		ConsoleProcessors::print_interface(win_screen.str());
+		std::vector<std::string> body{ "menu", "end" };
+		auto menu = command_manager.create_command(body);
+		ConsoleProcessors::print_interface(menu->execute(game_data));
+	}
+	void force_lose_screen()
+	{
+		std::ostringstream win_screen;
+
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "Your guild is in ruins. Inquisition apprehended all remaining members.\n";
+		win_screen << "Next time try your luck in different way.\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		win_screen << "****************************************\n";
+		ConsoleProcessors::print_interface(win_screen.str());
+		std::vector<std::string> body{ "menu", "end" };
+		auto menu = command_manager.create_command(body);
+		ConsoleProcessors::print_interface(menu->execute(game_data));
 	}
 
 	void run_game()
@@ -128,14 +150,24 @@ public:
 		while (!game_data.game_state->is_exit_requested())
 		{
 			auto cmd = ConsoleProcessors::get_next_command();
+#if _DEBUG
 			ConsoleProcessors::print_debug(cmd);
+#endif
 			auto cmd_cmd = command_manager.create_command(cmd);
 			auto rs = cmd_cmd->execute(game_data);
+#if _DEBUG
 			ConsoleProcessors::print_interface(rs);
-
+#endif
+#if !_DEBUG
+			ConsoleProcessors::clean_and_print(rs);
+#endif
 			if (game_data.win_condition())
 			{
 				force_win_screen();
+			}
+			if (game_data.lose_condition())
+			{
+				force_lose_screen();
 			}
 		}
 	}

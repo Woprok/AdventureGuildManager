@@ -20,17 +20,11 @@ public:
 		result_stream << "\t- exit: closes game.\n";
 		return result_stream.str();
 	}
-	std::string display_exit(GameDataManager& game_data_manager) const
+	std::string display_exit() const
 	{
 		std::ostringstream result_stream;
-		result_stream << "*****Game ended!*****" << "\n";
+		result_stream << "*****You can quit now!*****" << "\n";
 		result_stream << "Your journey as guild manager ends here!" << "\n";
-		result_stream << "Your final stats:" << "\n";
-		result_stream << "\t" << "Quest completed: " << game_data_manager.quests->get_completed().size() <<"\n";
-		result_stream << "\t" << "Quest failed: " << game_data_manager.quests->get_failed().size() <<"\n";
-		result_stream << "\t" << "Adventurer retired: " << game_data_manager.adventurers->get_inactive().size() <<"\n";
-		result_stream << "\t" << "Adventurer killed: " << game_data_manager.adventurers->get_dead().size() <<"\n";
-		result_stream << "\t" << "And much more could be shown..." <<"\n";
 		return result_stream.str();
 	}
 };

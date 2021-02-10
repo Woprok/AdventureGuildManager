@@ -66,7 +66,7 @@ public:
 		if (game_data_manager.game_state->get_progress_state())
 		{
 			game_data_manager.end_game();
-			return interface.display_end();
+			return interface.display_end(game_data_manager);
 		}
 		return interface.display_no_progress();
 	}

@@ -5,8 +5,9 @@
 
 #include "../Interfaces/IDisplayableInterfaces.hpp"
 #include "../UserInterfaces/AdventurerInterfaces.hpp"
+#include "../UserInterfaces/GuildInterfaces.hpp"
 
-class PerkInterfaces : public AdventurerInterfaces
+class PerkInterfaces : public AdventurerInterfaces, public GuildInterfaces
 {
 public:
 	PerkInterfaces() = default;
@@ -87,6 +88,16 @@ public:
 		return result_stream.str();
 	}
 
+	std::string display_bought(GameDataManager& game_data_manager, int perk_id) const
+	{
+		std::ostringstream result_stream;
+		result_stream << "*****Perk board receptionist!*****" << "\n";
+		result_stream << "Perk bought: " << perk_id << "\n";
+		result_stream << display_informations(game_data_manager);
+		return result_stream.str();
+	}
+
+	
 	int get_fame_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "fame");
@@ -103,7 +114,7 @@ public:
 		result_stream << "(";
 		result_stream << fame_amount;
 		result_stream << ") ";
-		result_stream << "is not valid:";
+		result_stream << "is not valid.";
 		result_stream << "\n";
 		return result_stream.str();
 	}
@@ -115,18 +126,8 @@ public:
 		result_stream << "(";
 		result_stream << perk_id;
 		result_stream << ") ";
-		result_stream << "is not valid:";
+		result_stream << "is not valid right now.";
 		result_stream << "\n";
-		return result_stream.str();
-	}
-private:
-	std::string display_informations(GameDataManager& game_data_manager) const
-	{
-		std::ostringstream result_stream;
-		result_stream << "*****Guild!*****" << "\n";
-		result_stream << "\t" << "- name: " << game_data_manager.guild->get_name() << "\n";
-		result_stream << "\t" << "- gold: " << game_data_manager.guild->base_stats.gold.get_value() << "\n";
-		result_stream << "\t" << "- fame: " << game_data_manager.guild->base_stats.fame.get_value() << "\n";
 		return result_stream.str();
 	}
 };

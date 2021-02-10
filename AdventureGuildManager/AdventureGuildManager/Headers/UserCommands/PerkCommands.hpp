@@ -30,7 +30,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "trade_fame" || command_context[0] == "-t");
+			&& (command_context[1] == "trade_fame" || command_context[1] == "-t");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -54,7 +54,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "requalification_course" || command_context[0] == "-r");
+			&& (command_context[1] == "requalification_course" || command_context[1] == "-r");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -78,7 +78,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "armory" || command_context[0] == "-a");
+			&& (command_context[1] == "armory" || command_context[1] == "-a");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -102,7 +102,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "church_of_heroes" || command_context[0] == "-c");
+			&& (command_context[1] == "church_of_heroes" || command_context[1] == "-c");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -127,7 +127,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "madness_of_master" || command_context[0] == "-m");
+			&& (command_context[1] == "madness_of_master" || command_context[1] == "-m");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -152,7 +152,7 @@ public:
 	{
 		return command_context.size() >= 2
 			&& (command_context[0] == "perk" || command_context[0] == "p")
-			&& (command_context[0] == "buy" || command_context[0] == "-b");
+			&& (command_context[1] == "buy" || command_context[1] == "-b");
 	}
 	std::string execute(GameDataManager& game_data_manager) override
 	{
@@ -160,7 +160,7 @@ public:
 
 		if (game_data_manager.buy_perk(perk_id))
 		{
-
+			return interface.display_bought(game_data_manager, perk_id);
 		}
 		return interface.display_perk_action_failed(perk_id);
 	}

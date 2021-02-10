@@ -5,6 +5,11 @@
 #include "../DataKeepers/QuestDataKeepers.hpp"
 #include "../Helpers/StringContexts.hpp"
 
+constexpr int GOLD_REWARD_BASE_PER_RARITY = 300;
+constexpr int FAME_REWARD_BASE_PER_RARITY = 50;
+constexpr int GOLD_PENALTY_BASE_PER_RARITY = 150;
+constexpr int FAME_PENALTY_BASE_PER_RARITY = 25;
+
 class QuestNameGenerator : public NameGenerator
 {
 public:
@@ -96,17 +101,17 @@ public:
 		// 0 - 39
 		return quest_data.get_quest_rarities()[0];
 	}
-	int generate_difficulty(int min_difficulty) const
+	int generate_difficulty(int min_difficulty, int max_difficulty) const
 	{
-		return std::clamp(difficulty_generator.get_next(), min_difficulty, MAX_QUEST_DIFFICULTY);
+		return std::min(std::clamp(difficulty_generator.get_next(), min_difficulty, MAX_QUEST_DIFFICULTY), max_difficulty);
 	}
 	
-	std::unique_ptr<Quest> create_quest(int min_difficulty, int max_quest_rarity)
+	std::unique_ptr<Quest> create_quest(int min_difficulty, int max_difficulty, int max_quest_rarity)
 	{
 		std::string&& name = quest_name_generator.generate_name();
 
 		QuestRarity&& rarity = generate_rarity(max_quest_rarity);
-		int&& difficulty = generate_difficulty(min_difficulty);
+		int&& difficulty = generate_difficulty(min_difficulty, max_difficulty);
 
 		GoldFameData&& reward = generate_reward(static_cast<int>(rarity));
 		GoldFameDeadlyData&& penalty = generate_penalty(static_cast<int>(rarity), difficulty);
@@ -118,14 +123,14 @@ public:
 
 	GoldFameData generate_reward(int rarity) const
 	{
-		auto&& gold = gold_reward_base_per_rarity * rarity + gold_divergence.get_next();
-		auto&& fame = fame_reward_base_per_rarity * rarity + fame_divergence.get_next();
+		auto&& gold = GOLD_REWARD_BASE_PER_RARITY * rarity + gold_divergence.get_next();
+		auto&& fame = FAME_REWARD_BASE_PER_RARITY * rarity + fame_divergence.get_next();
 		return GoldFameData(gold, fame);
 	}
 	GoldFameDeadlyData generate_penalty(int rarity, int difficulty) const
 	{
-		auto&& gold = gold_penalty_base_per_rarity * rarity + gold_divergence.get_next();
-		auto&& fame = fame_penalty_base_per_rarity * rarity + fame_divergence.get_next();
+		auto&& gold = GOLD_PENALTY_BASE_PER_RARITY * rarity + gold_divergence.get_next();
+		auto&& fame = FAME_PENALTY_BASE_PER_RARITY * rarity + fame_divergence.get_next();
 		auto&& is_deadly = difficulty >= difficulty_generator.get_next();
 		
 		return GoldFameDeadlyData(gold, fame, is_deadly);
@@ -137,10 +142,6 @@ protected:
 	UniformGenerator difficulty_generator { MIN_QUEST_DIFFICULTY, MAX_QUEST_DIFFICULTY };
 	UniformGenerator gold_divergence { 0, 200 };
 	UniformGenerator fame_divergence { 0, 20 };
-	int gold_reward_base_per_rarity = 100;
-	int fame_reward_base_per_rarity = 10;
-	int gold_penalty_base_per_rarity = 200;
-	int fame_penalty_base_per_rarity = 5;
 	QuestNameGenerator quest_name_generator;
 private:
 	quest_type_set generate_quest_types(int count) const

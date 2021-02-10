@@ -1,5 +1,9 @@
 ﻿#include "../Headers/GameDataManagers.hpp"
 
+bool GameDataManager::lose_condition() const
+{
+	return guild->base_stats.fame.get_value() <= 0 && guild->base_stats.gold.get_value() <= 0;
+}
 bool GameDataManager::win_condition() const
 {
 	return guild->get_prestige_level() == MAX_GUILD_LEVEL;
@@ -91,9 +95,10 @@ void GameDataManager::generate_quests(int quest_count)
 {
 	auto&& quest_rarity = guild->max_quest_rarity.get_value();
 	auto&& quest_difficulty = game_state->get_difficulty();
+	auto&& guild_level = guild->get_prestige_level();
 	for (int i = 0; i < quest_count; ++i)
 	{
-		quests->add_new_quest(gen_quests->create_quest(quest_difficulty, quest_rarity));
+		quests->add_new_quest(gen_quests->create_quest(quest_difficulty, guild_level + quest_difficulty, quest_rarity));
 	}
 }
 
