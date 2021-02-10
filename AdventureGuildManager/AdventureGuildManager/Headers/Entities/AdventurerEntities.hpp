@@ -57,8 +57,16 @@ public:
 	const quest_set& set_failure_quests(int value) { failure_quests.insert(value); return failure_quests; }
 
 	const skill_set& get_skills() const { return skills; }
-	const skill_set& add_skill(std::unique_ptr<ISkill>&& new_skill) { skills.insert(std::move(new_skill)); return skills; }
-	const skill_set& add_skills(skill_set&& new_skill_set) { skills.merge(std::move(new_skill_set)); return skills; }
+	const skill_set& add_skill(std::unique_ptr<ISkill>&& new_skill)
+	{
+		skills.insert(std::move(new_skill));
+		return skills;
+	}
+	const skill_set& add_skills(skill_set&& new_skill_set)
+	{
+		skills.merge(std::move(new_skill_set));
+		return skills;
+	}
 	/// <summary>
 	/// Attempt to remove del_count of skills from adventurer in random order.
 	/// </summary>
@@ -69,14 +77,14 @@ public:
 			if (!skills.empty())
 			{
 				std::uniform_int_distribution<unsigned> d(0, static_cast<int>(skills.size() - 1));
-
+	
 				// returns a random number from [0, skills.size() - 1]
 				unsigned r = d(Adventurer::rng);
 				
 				// iterates through the container to the r-th element
 				auto it = skills.begin();
 				for (; it != skills.end() && r > 0; ++it, r--) {}
-
+	
 				skills.erase(it);
 			}
 		}

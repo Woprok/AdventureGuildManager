@@ -27,6 +27,7 @@ public:
 	{
 		fill_skill_creator();
 		finalize_skill_instances();
+		insert_restricted_instances();
 	}
 	~SkillDataKeeper() = default;
 	
@@ -58,7 +59,7 @@ public:
 protected:
 	std::unordered_map<int, VirtualSkillCreator> skill_creators{};
 	skill_set skill_instances{};
-	skill_set restricted_skills{ std::make_unique<Godslayer>(GODSLAYER_ID) };
+	skill_set restricted_skills{};
 	IdSet skill_ids{};
 
 	void fill_skill_creator()
@@ -97,6 +98,11 @@ protected:
 			skill_instances.insert(std::move(new_skill));
 		}
 	}
+
+	void insert_restricted_instances()
+	{
+		restricted_skills.insert(create_skill(GODSLAYER_ID));
+	}
 private:
 	IdSet get_raw_options(const skill_set& restriction)
 	{
@@ -111,7 +117,7 @@ private:
 		}
 		return raw;
 	}
-
+	
 	skill_set&& generate_skills(int skill_count, const IdSet&& raw_set)
 	{
 		std::unordered_set<int> result;
@@ -120,7 +126,7 @@ private:
 			std::inserter(result, result.begin()),
 			std::clamp(skill_count, 0, static_cast<int>(raw_set.size())),
 			std::mt19937{ std::random_device{}() });
-
+	
 		skill_set return_skills;
 		for (auto&& value : result)
 		{
