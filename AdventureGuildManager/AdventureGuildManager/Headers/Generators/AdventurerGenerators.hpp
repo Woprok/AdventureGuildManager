@@ -1,6 +1,8 @@
 ﻿#ifndef ADVENTURER_GENERATORS_HPP
 #define ADVENTURER_GENERATORS_HPP
 
+#include <iostream>
+
 #include "NeutralGenerators.hpp"
 #include "../DataKeepers/AdventurerDataKeepers.hpp"
 #include "../DataKeepers/SkillDataKeepers.hpp"
@@ -44,7 +46,6 @@ public:
 		AdventurerRarity&& rarity = generate_rarity();
 		const int rarity_as_int = static_cast<int>(rarity);
 		skill_set&& skills = skill_data.generate(rarity_as_int);
-
 		int&& experience = generate_experience(rarity_as_int);
 		int&& recruit = generate_recruit(rarity_as_int);
 		int&& retire = generate_retire(rarity_as_int);

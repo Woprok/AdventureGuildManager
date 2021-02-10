@@ -98,7 +98,7 @@ public:
 	}
 	int generate_difficulty(int min_difficulty) const
 	{
-		return std::clamp(rarity_generator.get_next(), min_difficulty, MAX_QUEST_DIFFICULTY);
+		return std::clamp(difficulty_generator.get_next(), min_difficulty, MAX_QUEST_DIFFICULTY);
 	}
 	
 	std::unique_ptr<Quest> create_quest(int min_difficulty, int max_quest_rarity)

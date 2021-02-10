@@ -14,6 +14,7 @@ void GameDataManager::start_game()
 {
 	GameDataManager::reset_game();
 	game_state->change_progress_state(true);
+	progress_game();
 }
 
 void GameDataManager::end_game()

@@ -148,6 +148,7 @@ protected:
 			<< join_base_total(adventurer.retire_cost.get_value(), adventurer.get_level_retire_cost()) << "\n";
 		result_stream << "\t\t" << "- retirement fame: "
 			<< join_base_total(adventurer.get_retire_fame(), adventurer.get_level_retire_fame()) << "\n";
+		result_stream << "\t\t" << "- living cost: " << adventurer.living_cost.get_value() << "\n";
 		result_stream << "\t\t" << "- skills: " << join_skill(adventurer.get_skills()) << "\n";
 		result_stream << "\t\t" << "- quest completed: " << join_quest(game_data_manager, adventurer.get_success_quests()) << "\n";
 		result_stream << "\t\t" << "- quest failed: " << join_quest(game_data_manager, adventurer.get_failure_quests()) << "\n";

@@ -14,7 +14,7 @@
 
 constexpr int MIN_GUILD_LEVEL = 1;
 constexpr int MAX_GUILD_LEVEL = 10;
-constexpr int DEFAULT_GUILD_QUEST_RARITY = 5;
+constexpr int DEFAULT_GUILD_QUEST_RARITY = 3;
 constexpr int DEFAULT_GUILD_GOLD_COUNT = 2000;
 constexpr int DEFAULT_GUILD_FAME_COUNT = 100;
 

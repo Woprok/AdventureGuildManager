@@ -1,8 +1,10 @@
 ﻿#ifndef SKILL_DATA_KEEPERS_HPP
 #define SKILL_DATA_KEEPERS_HPP
 
+#include <iostream>
 #include <iterator>
 #include <memory>
+#include <ostream>
 #include <random>
 #include <unordered_map>
 #include <unordered_set>
@@ -34,16 +36,16 @@ public:
 	/// <summary>
 	/// Uses default restriction system.
 	/// </summary>
-	skill_set&& generate(int skill_count)
+	skill_set generate(int skill_count)
 	{
-		return std::move(generate_skills(skill_count, get_raw_options(restricted_skills)));
+		return generate_skills(skill_count, get_raw_options(restricted_skills));
 	}
 	/// <summary>
 	/// Uses custom restriction sytem with default system.
 	/// </summary>
-	skill_set&& generate(int skill_count, const skill_set& restriction)
+	skill_set generate(int skill_count, const skill_set& restriction)
 	{
-		return std::move(generate_skills(skill_count, get_raw_options(restriction)));
+		return generate_skills(skill_count, get_raw_options(restriction));
 	}
 
 	std::unique_ptr<ISkill> create_skill(int skill_id)
@@ -118,7 +120,7 @@ private:
 		return raw;
 	}
 	
-	skill_set&& generate_skills(int skill_count, const IdSet&& raw_set)
+	skill_set generate_skills(int skill_count, const IdSet&& raw_set)
 	{
 		std::unordered_set<int> result;
 		std::sample(raw_set.begin(),
@@ -132,7 +134,7 @@ private:
 		{
 			return_skills.insert(create_skill(value));
 		}
-		return std::move(return_skills);
+		return return_skills;
 	}
 };
 

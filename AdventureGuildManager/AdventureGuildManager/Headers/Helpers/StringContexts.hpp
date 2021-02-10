@@ -14,7 +14,12 @@ public:
 	{
 		std::string result;
 		return std::accumulate(context.begin() + offset, context.end(), result,
-			[delimeter](const std::string& a, const std::string& b) { return a + delimeter + b; });
+			[delimeter](const std::string& a, const std::string& b)
+			{
+				if (a.empty())
+					return b;
+				return a + delimeter + b;
+			});
 	}
 
 
@@ -22,7 +27,12 @@ public:
 	{
 		std::string result;
 		return std::accumulate(context.begin(), context.end(), result,
-			[delimeter](const std::string& a, const std::string& b) { return a + delimeter + b; });
+			[delimeter](const std::string& a, const std::string& b)
+			{
+				if (a.empty())
+					return b;
+				return a + delimeter + b;
+			});
 	}
 
 };

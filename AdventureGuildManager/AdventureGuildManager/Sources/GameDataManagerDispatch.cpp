@@ -143,7 +143,7 @@ bool GameDataManager::on_failure_quest(Adventurer* adventurer, Quest* quest)
 
 	// Update experience
 	const auto old_lvl = adventurer->get_level();
-	adventurer->experience.add_value(experience_loss);
+	adventurer->experience.rmv_value(experience_loss);
 	const auto new_lvl = adventurer->get_level();
 	resolve_level(adventurer, old_lvl, new_lvl);
 
