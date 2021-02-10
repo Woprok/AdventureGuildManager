@@ -69,7 +69,7 @@ class MadnessOfMaster : public IPerk
 {
 public:
 	MadnessOfMaster(int new_id) : IPerk("Master and guide to hypemaster", new_id,
-		"Certainly something good will come from this? Obtain special skill and rarity for an adventurer.", 10) { }
+		"Certainly something good will come from this? Obtain special skill and rarity for an adventurer.", 9) { }
 	~MadnessOfMaster() override = default;
 	MadnessOfMaster(const MadnessOfMaster&) = delete;
 	MadnessOfMaster& operator=(MadnessOfMaster) = delete;
