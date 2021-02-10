@@ -55,9 +55,9 @@ typedef std::unordered_set<QuestType> quest_type_set;
 class Quest : public IdNameEntity
 {
 public:
-	Quest(std::string& new_name, GoldFameData& reward_data, GoldFameDeadlyData& penalty_data, 
+	Quest(std::string&& new_name, GoldFameData& reward_data, GoldFameDeadlyData& penalty_data, 
 		  QuestRarity new_rarity, int new_difficulty, quest_type_set& new_set_of_types)
-		: IdNameEntity(new_name, auto_id++), reward(reward_data), penalty(penalty_data), adventurer(-1),
+		: IdNameEntity(std::move(new_name), auto_id++), reward(reward_data), penalty(penalty_data), adventurer(-1),
 		  rarity(new_rarity), state(QuestStateEnum::Undefined)
 	{
 		difficulty.set_value(new_difficulty);
@@ -81,7 +81,7 @@ public:
 		types.merge(new_set_of_types);
 		return types;
 	}
-	bool has_quest_type(QuestType find_type) const { return types.contains(find_type); }
+	bool has_quest_type(const QuestType& find_type) const { return types.contains(find_type); }
 
 protected:
 	inline static int auto_id = 0;

@@ -31,7 +31,7 @@ void GameDataManager::wait_turn()
 	GameDataManager::progress_game();
 }
 
-void alter_wait_change(perk_set& perks, int& total_sum)
+void alter_wait_change(const perk_set& perks, int& total_sum)
 {
 	for (auto&& item : perks)
 	{
@@ -41,13 +41,13 @@ void alter_wait_change(perk_set& perks, int& total_sum)
 
 void GameDataManager::substract_quest_wait_fees()
 {
-	const int quest_completed = quests->get_completed().size();
-	const int quest_failed = quests->get_failed().size();
-	double fee_multiplicator = (quest_failed + 1) / (quest_completed + 1);
+	const int quest_completed = static_cast<int>(quests->get_completed().size());
+	const int quest_failed = static_cast<int>(quests->get_failed().size());
+	double fee_multiplicator = static_cast<double>((quest_failed + 1)) / static_cast<double>((quest_completed + 1));
 	fee_multiplicator = std::clamp(fee_multiplicator,0.5, 1.5);
 	
-	const int quest_reserved = quests->get_reserved().size();
-	int sum = (quest_reserved * DEFAULT_QUEST_RESERVATION_GOLD_RENT) * fee_multiplicator;
+	const int quest_reserved = static_cast<int>(quests->get_reserved().size());
+	int sum = static_cast<int>((quest_reserved * DEFAULT_QUEST_RESERVATION_GOLD_RENT) * fee_multiplicator);
 	
 	alter_wait_change(guild->get_perks(), sum);
 	
@@ -68,7 +68,7 @@ void GameDataManager::substract_adventurer_wait_fees()
 
 void GameDataManager::progress_game()
 {
-	const int quest_count = quests->get_available().size();
+	const int quest_count = static_cast<int>(quests->get_available().size());
 	if (quest_count <= MIN_QUEST_COUNT)
 	{
 		const int max_quest_to_generate = MAX_QUEST_COUNT - quest_count;
@@ -76,7 +76,7 @@ void GameDataManager::progress_game()
 		UniformGenerator generator(min_quest_to_generate, max_quest_to_generate);
 		generate_quests(generator.get_next());
 	}
-	int adventurer_count = adventurers->get_available().size();
+	int adventurer_count = static_cast<int>(adventurers->get_available().size());
 	if (adventurer_count <= MIN_ADVENTURER_COUNT)
 	{
 		const int max_adventurer_to_generate = MAX_ADVENTURER_COUNT - adventurer_count;
@@ -100,7 +100,7 @@ void GameDataManager::generate_adventurers(int adventurer_count)
 {
 	for (int i = 0; i < adventurer_count; ++i)
 	{
-		adventurers->add_new_adventurer(gen_adventurers->create_adventurer());
+		adventurers->add_new_adventurer(std::move(gen_adventurers->create_adventurer()));
 	}
 }
 
@@ -162,7 +162,7 @@ bool GameDataManager::pension_adventurer(const int adventurer_id)
 	
 	if (adventurer != nullptr && guild->base_stats.gold.get_value() >= retire_cost)
 	{
-		// Substract retirement cost
+		// Subtract retirement cost
 		guild->base_stats.gold.rmv_value(retire_cost);
 		guild->base_stats.fame.add_value(retire_fame);
 
@@ -212,7 +212,7 @@ bool GameDataManager::retrain(int adventurer_id)
 	const auto adventurer = adventurers->find_hired(adventurer_id);
 	if (adventurer == nullptr || perk == nullptr)
 		return false;
-	const int adventurer_skill_count = adventurer->get_skills().size();
+	const int adventurer_skill_count = static_cast<int>(adventurer->get_skills().size());
 	const int retrain_cost = adventurer_skill_count * DEFAULT_RETRAIN_COST_PER_SKILL;
 
 	if (guild->base_stats.gold.get_value() >= retrain_cost)
@@ -221,7 +221,7 @@ bool GameDataManager::retrain(int adventurer_id)
 		guild->base_stats.gold.rmv_value(retrain_cost);
 		// retrain is remove and add (chance that some skill stay is completely fine)
 		adventurer->rmv_skill(adventurer_skill_count);
-		adventurer->set_skills(std::move(skills->generate(adventurer_skill_count)));
+		adventurer->add_skills(std::move(skills->generate(adventurer_skill_count)));
 		return true;
 	}
 	return false;
@@ -245,7 +245,7 @@ bool GameDataManager::upgrade(int adventurer_id)
 		guild->base_stats.gold.rmv_value(upgrade_cost);
 		// retrain is remove and add (chance that some skill stay is completely fine)
 		adventurer->rarity.set_value(AdventurerRarity::Innkeeper);
-		adventurer->set_skills(std::move(skills->generate(rarity_diff, adventurer->get_skills())));
+		adventurer->add_skills(std::move(skills->generate(rarity_diff, adventurer->get_skills())));
 		return true;
 	}
 	return false;
@@ -269,10 +269,10 @@ bool GameDataManager::grant_godslayer(int adventurer_id)
 		if (rarity_diff > 0)
 		{
 			adventurer->rarity.set_value(AdventurerRarity::God);
-			adventurer->set_skills(std::move(skills->generate(rarity_diff, adventurer->get_skills())));
+			adventurer->add_skills(std::move(skills->generate(rarity_diff, adventurer->get_skills())));
 		}
 
-		adventurer->set_skills(skills->create_skill(GODSLAYER_ID));
+		adventurer->add_skill(std::move(skills->create_skill(GODSLAYER_ID)));
 		return true;
 	}
 	return false;

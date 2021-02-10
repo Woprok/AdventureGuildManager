@@ -12,7 +12,7 @@ public:
 	PerkInterfaces() = default;
 	~PerkInterfaces() override = default;
 
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Perk Commands:\n";
@@ -54,7 +54,7 @@ public:
 		result_stream << display_informations(game_data_manager);
 		return result_stream.str();
 	}
-	std::string display_requalification_course(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_requalification_course(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";
@@ -62,7 +62,7 @@ public:
 		result_stream << find_adventurer_detail(game_data_manager, adventurer_id);
 		return result_stream.str();
 	}
-	std::string display_armory(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_armory(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";
@@ -70,7 +70,7 @@ public:
 		result_stream << find_adventurer_detail(game_data_manager, adventurer_id);
 		return result_stream.str();
 	}
-	std::string display_madness_of_master(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_madness_of_master(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";
@@ -78,7 +78,7 @@ public:
 		result_stream << find_adventurer_detail(game_data_manager, adventurer_id);
 		return result_stream.str();
 	}
-	std::string display_church_of_heroes(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_church_of_heroes(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";
@@ -87,15 +87,15 @@ public:
 		return result_stream.str();
 	}
 
-	int get_fame_value(std::string&& cs)
+	int get_fame_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "fame");
 	}
-	int get_perk_id_value(std::string&& cs)
+	int get_perk_id_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "perk id");
 	}
-	std::string display_trade_action_failed(int fame_amount)
+	std::string display_trade_action_failed(int fame_amount) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";
@@ -107,7 +107,7 @@ public:
 		result_stream << "\n";
 		return result_stream.str();
 	}
-	std::string display_perk_action_failed(int perk_id)
+	std::string display_perk_action_failed(int perk_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Perk board receptionist!*****" << "\n";

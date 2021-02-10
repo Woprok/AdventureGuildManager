@@ -21,8 +21,8 @@ constexpr int DEFAULT_GUILD_FAME_COUNT = 100;
 class Guild : public IdNameEntity
 {
 public:
-	Guild(std::string& new_name, GoldFameData& new_base_stats)
-		: IdNameEntity(new_name, auto_id++), base_stats(new_base_stats) { }
+	Guild(std::string&& new_name, GoldFameData&& new_base_stats)
+		: IdNameEntity(std::move(new_name), auto_id++), base_stats(new_base_stats) { }
 	~Guild() = default;
 
 	GoldFameData base_stats;

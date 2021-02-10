@@ -8,7 +8,7 @@ class GuildInterfaces : public IDisplayeableInterfaces
 public:
 	GuildInterfaces() = default;
 	~GuildInterfaces() override = default;
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Guild Commands:\n";
@@ -59,7 +59,7 @@ public:
 		return result_stream.str();
 	}
 	
-	std::string get_name()
+	std::string get_name() const
 	{
 		return InputInterfaces::get_str("name");
 	}

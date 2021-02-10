@@ -10,6 +10,8 @@ class QuestNameGenerator : public NameGenerator
 public:
 	QuestNameGenerator() = default;
 	~QuestNameGenerator() override = default;
+	QuestNameGenerator(const QuestNameGenerator&) = delete;
+	QuestNameGenerator& operator=(QuestNameGenerator) = delete;
 	std::string generate_name() const
 	{
 		switch (switch_value.get_next())
@@ -70,6 +72,8 @@ class QuestGenerator
 public:
 	QuestGenerator(QuestDataKeeper& current_quest_data) : quest_data(current_quest_data) {}
 	~QuestGenerator() = default;
+	QuestGenerator(const QuestGenerator&) = delete;
+	QuestGenerator& operator=(QuestGenerator) = delete;
 	quest_type_set generate_types(int count) const { return generate_quest_types(count); }
 	quest_type_set generate_types(QuestRarity quest_rarity) const { return generate_quest_types(static_cast<int>(quest_rarity)); }
 	QuestRarity generate_rarity(int max_rarity) const
@@ -109,7 +113,7 @@ public:
 
 		quest_type_set&& quest_types = generate_quest_types(difficulty);
 		
-		return std::make_unique<Quest>(name, reward, penalty, rarity, difficulty, quest_types);
+		return std::make_unique<Quest>(std::move(name), reward, penalty, rarity, difficulty, quest_types);
 	}
 
 	GoldFameData generate_reward(int rarity) const

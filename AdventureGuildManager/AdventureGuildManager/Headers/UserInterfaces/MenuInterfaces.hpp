@@ -12,7 +12,7 @@ class MenuInterfaces final : public IDisplayeableInterfaces
 public:
 	MenuInterfaces() = default;
 	~MenuInterfaces() override = default;
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Menu Commands:\n";
@@ -62,7 +62,7 @@ public:
 		return result_stream.str();
 	}
 
-	int get_difficulty_value(std::string&& cs)
+	int get_difficulty_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "difficulty");
 	}

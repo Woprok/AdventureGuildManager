@@ -16,7 +16,7 @@ public:
 	/// Test if command_context is body without parameters for this command.
 	/// </summary>
 	/// <returns>True or False</returns>
-	static bool can_derive_from(string_context& command_context) { return false; }
+	static bool can_derive_from([[maybe_unused]] string_context& command_context) { return false; }
 	/// <summary>
 	/// Runs command over real data, verifies parameters of command.
 	/// </summary>

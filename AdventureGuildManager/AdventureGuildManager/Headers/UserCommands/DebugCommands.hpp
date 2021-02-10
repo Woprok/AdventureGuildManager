@@ -13,11 +13,11 @@ public:
 		return command_context.size() == 1
 			&& command_context[0] == "debug";
 	}
-	std::string execute(GameDataManager& game_data_manager) override
+	std::string execute([[maybe_unused]] GameDataManager& game_data_manager) override
 	{
 		return "Runtime debugging command completed!\n";
 	}
-/*/
+/*
 private:
 	void debug_level_up_down(GameData& game_data)
 	{
@@ -45,7 +45,7 @@ private:
 			std::cout << type->get_name() << "\n";
 		}
 	}
-/**/
+*/
 };
 
 #endif

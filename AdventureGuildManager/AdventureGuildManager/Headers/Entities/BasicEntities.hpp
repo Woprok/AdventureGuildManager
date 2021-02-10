@@ -6,7 +6,7 @@
 class NameEntity
 {
 public:
-	NameEntity(std::string& new_name) : name(new_name) {}
+	NameEntity(std::string&& new_name) : name(std::move(new_name)) {}
 	virtual ~NameEntity() = default;
 	virtual const std::string& get_name() const { return name; }
 	virtual const std::string& set_name(std::string new_name) { name = new_name; return name; }
@@ -28,7 +28,7 @@ protected:
 class IdNameEntity : public NameEntity, public IdEntity
 {
 public:
-	IdNameEntity(std::string& new_name, int new_id)	: NameEntity(new_name), IdEntity(new_id) { }
+	IdNameEntity(std::string&& new_name, int new_id) : NameEntity(std::move(new_name)), IdEntity(new_id) { }
 	virtual ~IdNameEntity() = default;
 };
 

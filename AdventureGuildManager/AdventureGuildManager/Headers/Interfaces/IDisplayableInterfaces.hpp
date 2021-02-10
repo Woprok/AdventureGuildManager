@@ -12,7 +12,7 @@ public:
 	/// <summary>
 	/// Summarize all commands under this interface.
 	/// </summary>
-	virtual std::string display_default()
+	virtual std::string display_default() const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Undefined user interface.*****" << "\n";

@@ -101,11 +101,11 @@ private:
 	IdSet get_raw_options(const skill_set& restriction)
 	{
 		IdSet raw = skill_ids;
-		for (auto&& skill : restriction)
+		for (const auto& skill : restriction)
 		{
 			raw.erase(skill->get_id());
 		}
-		for (auto&& skill : restricted_skills)
+		for (const auto& skill : restricted_skills)
 		{
 			raw.erase(skill->get_id());
 		}

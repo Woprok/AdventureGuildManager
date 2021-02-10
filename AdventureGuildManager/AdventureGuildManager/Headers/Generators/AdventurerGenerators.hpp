@@ -14,6 +14,8 @@ public:
 	AdventurerGenerator(AdventurerDataKeeper& current_adventurer_data, SkillDataKeeper& current_skill_data)
 		: adventurer_data(current_adventurer_data), skill_data((current_skill_data)) {}
 	~AdventurerGenerator() = default;
+	AdventurerGenerator(const AdventurerGenerator&) = delete;
+	AdventurerGenerator& operator=(AdventurerGenerator) = delete;
 	AdventurerRarity generate_rarity() const
 	{
 		int gen_rarity = rarity_generator.get_next();
@@ -48,7 +50,7 @@ public:
 		int&& retire = generate_retire(rarity_as_int);
 		int&& living = generate_living(rarity_as_int);
 
-		return std::make_unique<Adventurer>(name, rarity, experience, recruit, retire, living, skills);
+		return std::make_unique<Adventurer>(std::move(name), rarity, experience, recruit, retire, living, std::move(skills));
 	}
 	int generate_experience(int rarity) const
 	{

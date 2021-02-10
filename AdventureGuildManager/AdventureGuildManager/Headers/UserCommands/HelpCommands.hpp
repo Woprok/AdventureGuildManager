@@ -23,7 +23,7 @@ public:
 		return command_context.size() == 1
 			&& (command_context[0] == "help" || command_context[0] == "h");
 	}
-	std::string execute(GameDataManager& game_data_manager) override
+	std::string execute([[maybe_unused]] GameDataManager& game_data_manager) override
 	{
 		std::ostringstream result;
 		result << help.display_default();

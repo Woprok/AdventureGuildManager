@@ -13,7 +13,7 @@ class ErrorInterfaces final : public IDisplayeableInterfaces
 public:
 	ErrorInterfaces() = default;
 	~ErrorInterfaces() override = default;
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Error Commands:\n";

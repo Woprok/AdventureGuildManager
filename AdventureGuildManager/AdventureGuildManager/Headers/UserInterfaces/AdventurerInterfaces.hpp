@@ -11,7 +11,7 @@ class AdventurerInterfaces : public IDisplayeableInterfaces
 public:
 	AdventurerInterfaces() = default;
 	~AdventurerInterfaces() override = default;
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Adventurer Commands:\n";
@@ -25,7 +25,7 @@ public:
 		return result_stream.str();
 	}
 
-	std::string display_available(GameDataManager& game_data_manager)
+	std::string display_available(GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -33,7 +33,7 @@ public:
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_available());
 		return result_stream.str();
 	}
-	std::string display_hired(GameDataManager& game_data_manager)
+	std::string display_hired(GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -41,15 +41,15 @@ public:
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_hired());
 		return result_stream.str();
 	}
-	std::string display_dead(GameDataManager& game_data_manager)
+	std::string display_dead(GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
 		result_stream << "Killed in action adventurers:" << "\n";
 		result_stream << list_adventurers(game_data_manager, game_data_manager.adventurers->get_dead());
 		return result_stream.str();
-	}
-	std::string display_inactive(GameDataManager& game_data_manager)
+	} 
+	std::string display_inactive(GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board!*****" << "\n";
@@ -58,7 +58,7 @@ public:
 		return result_stream.str();
 	}
 	
-	std::string display_adventurer_hired(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_adventurer_hired(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board receptionist!*****" << "\n";
@@ -66,7 +66,7 @@ public:
 		result_stream << find_adventurer_detail(game_data_manager, adventurer_id);
 		return result_stream.str();
 	}
-	std::string display_adventurer_retired(GameDataManager& game_data_manager, int adventurer_id)
+	std::string display_adventurer_retired(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board receptionist!*****" << "\n";
@@ -75,7 +75,7 @@ public:
 		return result_stream.str();
 	}
 
-	std::string display_adventurer_action_failed(int adventurer_id)
+	std::string display_adventurer_action_failed(int adventurer_id) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "*****Adventurer board receptionist!*****" << "\n";
@@ -88,12 +88,12 @@ public:
 		return result_stream.str();
 	}
 
-	int get_adventurer_id_value(std::string&& cs)
+	int get_adventurer_id_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "adventurer id");
 	}
 protected:
-	std::string list_adventurers(GameDataManager& game_data_manager, const adventurer_collection& collection)
+	std::string list_adventurers(GameDataManager& game_data_manager, const adventurer_collection& collection) const
 	{
 		std::ostringstream result;
 		for (auto&& adventurer : collection)
@@ -120,7 +120,7 @@ protected:
 	std::string join_skill(const skill_set& skills) const
 	{
 		std::unordered_set<std::string> list_of_types;
-		for (auto&& skill : skills)
+		for (const auto& skill : skills)
 		{
 			list_of_types.insert(skill->get_name());
 		}
@@ -135,7 +135,7 @@ protected:
 		return std::to_string(total) + " from base " + std::to_string(base);
 	}
 
-	std::string adventurer_detail(GameDataManager& game_data_manager, Adventurer& adventurer) const
+	std::string adventurer_detail(GameDataManager& game_data_manager, const Adventurer& adventurer) const
 	{
 		std::ostringstream result_stream;
 		result_stream << "\t" << adventurer.get_id() << " - " << adventurer.get_name() << "\n";
@@ -154,7 +154,7 @@ protected:
 		return result_stream.str();
 	}
 
-	std::string find_adventurer_detail(GameDataManager& game_data_manager, int adventurer_id)
+	std::string find_adventurer_detail(GameDataManager& game_data_manager, int adventurer_id) const
 	{
 		return adventurer_detail(game_data_manager, *game_data_manager.adventurers->find_adventurer(adventurer_id));
 	}

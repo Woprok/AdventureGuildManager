@@ -1,8 +1,8 @@
 ﻿#include "../Headers/GameDataManagers.hpp"
 
-constexpr int QUEST_COMPARE_BASE_MINPOINT = 10;
-constexpr int QUEST_COMPARE_BASE_MIDPOINT = 51;
-constexpr int QUEST_COMPARE_BASE_MAXPOINT = 90;
+constexpr long long QUEST_COMPARE_BASE_MINPOINT = 10;
+constexpr long long QUEST_COMPARE_BASE_MIDPOINT = 51;
+constexpr long long QUEST_COMPARE_BASE_MAXPOINT = 90;
 
 int GameDataManager::get_experience_change(int quest_difficulty, int adventurer_level)
 {
@@ -18,7 +18,7 @@ void GameDataManager::resolve_level(Adventurer* adventurer, int old_lvl, int new
 	const int skill_count = new_lvl / 5 - old_lvl / 5;
 	if (skill_count > 0)
 	{
-		adventurer->set_skills(skills->generate(skill_count, adventurer->get_skills()));
+		adventurer->add_skills(std::move(skills->generate(skill_count, adventurer->get_skills())));
 	}
 	else if (skill_count < 0) // level down at 5 and 10 does something
 	{
@@ -26,12 +26,12 @@ void GameDataManager::resolve_level(Adventurer* adventurer, int old_lvl, int new
 	}
 }
 
-bool calculate_success(unsigned long long chance, unsigned long long base)
+bool calculate_success(int chance, int base)
 {
 	return chance >= base;
 }
 
-bool GameDataManager::get_final_result(unsigned long long compare_point, int adventurer_level, int quest_difficulty)
+bool GameDataManager::get_final_result(int compare_point, int adventurer_level, int quest_difficulty)
 {
 	bool final_result;
 
@@ -60,45 +60,44 @@ bool GameDataManager::get_final_result(unsigned long long compare_point, int adv
 
 int get_final_compare_point(Adventurer* adventurer)
 {
-	int compare_value = adventurer->get_failure_quests().size() + QUEST_COMPARE_BASE_MIDPOINT - adventurer->get_success_quests().size();
+	const long long compare_value = static_cast<long long>(
+		adventurer->get_failure_quests().size() + QUEST_COMPARE_BASE_MIDPOINT - adventurer->get_success_quests().size());
 
-	compare_value = std::clamp(compare_value, QUEST_COMPARE_BASE_MINPOINT, QUEST_COMPARE_BASE_MAXPOINT);
-
-	return compare_value;
+	return static_cast<int>(std::clamp(compare_value, QUEST_COMPARE_BASE_MINPOINT, QUEST_COMPARE_BASE_MAXPOINT));
 }
 
-void alter_roll_calculation(Adventurer* adventurer, int& adventurer_level)
+void alter_roll_calculation(const skill_set& skills, int& adventurer_level)
 {
-	for (auto && skill : adventurer->get_skills())
+	for (const auto& skill : skills)
 	{
 		skill->execute_roll_calculation_change(adventurer_level);
 	}
 }
-void alter_roll_result(Adventurer* adventurer, const quest_type_set& quest_types, bool& result)
+void alter_roll_result(const skill_set& skills, const quest_type_set& quest_types, bool& result)
 {
-	for (auto&& skill : adventurer->get_skills())
+	for (const auto& skill : skills)
 	{
 		skill->execute_roll_result_change(quest_types, result);
 	}
 }
-void alter_reward(skill_set& skills, perk_set& perks, GoldFameData& data, int& experience)
+void alter_reward(const skill_set& skills, const perk_set& perks, GoldFameData& data, int& experience)
 {
-	for (auto&& item : skills)
+	for (const auto& item : skills)
 	{
 		item->execute_reward_change(data, experience);
 	}
-	for (auto&& item : perks)
+	for (const auto& item : perks)
 	{
 		item->execute_reward_change(data, experience);
 	}
 }
-void alter_penalty(skill_set& skills, perk_set& perks, GoldFameDeadlyData& data, int& experience)
+void alter_penalty(const skill_set& skills, const perk_set& perks, GoldFameDeadlyData& data, int& experience)
 {
-	for (auto&& item : skills)
+	for (const auto& item : skills)
 	{
 		item->execute_penalty_change(data, experience);
 	}
-	for (auto&& item : perks)
+	for (const auto& item : perks)
 	{
 		item->execute_penalty_change(data, experience);
 	}
@@ -172,11 +171,11 @@ bool GameDataManager::embark_on_quest(Adventurer* adventurer, Quest* quest)
 	int adventurer_level = adventurer->get_level();
 	int quest_level = quest->get_difficulty();
 
-	alter_roll_calculation(adventurer, adventurer_level);
+	alter_roll_calculation(adventurer->get_skills(), adventurer_level);
 	
 	bool first_result = get_final_result(final_compare_point, adventurer_level, quest_level);
 
-	alter_roll_result(adventurer, quest->get_quest_types(), first_result);
+	alter_roll_result(adventurer->get_skills(), quest->get_quest_types(), first_result);
 
 	return first_result
 		? on_success_quest(adventurer, quest)

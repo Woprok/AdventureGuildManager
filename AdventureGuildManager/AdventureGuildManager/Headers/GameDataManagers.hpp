@@ -3,7 +3,6 @@
 
 #include <memory>
 
-
 #include "Entities/AdventurerEntities.hpp"
 #include "Entities/QuestEntities.hpp"
 #include "Entities/GuildEntitiess.hpp"
@@ -42,7 +41,17 @@ public:
 	GameDataManager()
 	{
 		game_state = std::make_unique<GameState>();
+		guild = std::make_unique<Guild>("My first guild", GoldFameData(0, 0));
+		quests = std::make_unique<QuestDataKeeper>();
+		skills = std::make_unique<SkillDataKeeper>();
+		adventurers = std::make_unique<AdventurerDataKeeper>();
+		gen_quests = std::make_unique<QuestGenerator>(*quests);
+		gen_adventurers = std::make_unique<AdventurerGenerator>(*adventurers, *skills);
+		perks = std::make_unique<PerkDataKeeper>();
 	}
+	~GameDataManager() = default;
+	GameDataManager(const GameDataManager&) = delete;
+	GameDataManager& operator=(GameDataManager) = delete;
 	std::unique_ptr<GameState> game_state;
 	std::unique_ptr<Guild> guild;
 	std::unique_ptr<QuestDataKeeper> quests;
@@ -134,7 +143,7 @@ protected:
 
 	int get_experience_change(int quest_difficulty, int adventurer_level);
 	void resolve_level(Adventurer* adventurer, int old_lvl, int new_lvl);
-	bool get_final_result(unsigned long long compare_point, int adventurer_level, int quest_difficulty);
+	bool get_final_result(int compare_point, int adventurer_level, int quest_difficulty);
 	bool embark_on_quest(Adventurer* adventurer, Quest* quest);
 	bool on_success_quest(Adventurer* adventurer, Quest* quest);
 	bool on_failure_quest(Adventurer* adventurer, Quest* quest);

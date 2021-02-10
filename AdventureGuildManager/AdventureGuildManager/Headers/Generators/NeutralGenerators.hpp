@@ -14,10 +14,10 @@
 class UniformGenerator final
 {
 public:
-	UniformGenerator(int min_value, int max_value) : distribution(0, max_value) { }
+	UniformGenerator(int min_value, int max_value) : distribution(min_value, max_value) { }
 	int get_next() const { return distribution(rng); }
 protected:
-	std::uniform_int_distribution<unsigned> distribution;
+	std::uniform_int_distribution<> distribution;
 	inline static std::mt19937 rng{ std::random_device{}() };
 };
 
@@ -26,6 +26,8 @@ class NameGenerator
 public:
 	NameGenerator() = default;
 	virtual ~NameGenerator() = default;
+	NameGenerator(const TradeFame&) = delete;
+	NameGenerator& operator=(NameGenerator) = delete;
 	std::string get_random_item(const std::vector<std::string>& collection) const
 	{
 		std::vector<std::string> result;

@@ -97,6 +97,10 @@ private:
 class GameManager
 {
 public:
+	GameManager() = default;
+	~GameManager() = default;
+	GameManager(const GameManager&) = delete;
+	GameManager& operator=(GameManager) = delete;
 	void force_menu()
 	{
 		std::vector<std::string> body  { "menu", "start" };

@@ -9,7 +9,7 @@ class QuestInterfaces : public IDisplayeableInterfaces
 public:
 	QuestInterfaces() = default;
 	~QuestInterfaces() override = default;
-	std::string display_default() override
+	std::string display_default() const  override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Quest Commands:\n";
@@ -99,11 +99,11 @@ public:
 		return result_stream.str();
 	}
 	
-	int get_adventurer_id_value(std::string&& cs)
+	int get_adventurer_id_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "adventurer id");
 	}
-	int get_quest_id_value(std::string&& cs)
+	int get_quest_id_value(std::string&& cs) const
 	{
 		return InputInterfaces::get_num(cs, "quest id");
 	}
@@ -134,7 +134,7 @@ private:
 	}
 	std::string join_adventurer(GameDataManager& game_data_manager, int adventurer_id) const
 	{
-		const auto&& adventurer = game_data_manager.adventurers->find_adventurer(adventurer_id);
+		const auto adventurer = game_data_manager.adventurers->find_adventurer(adventurer_id);
 		return adventurer != nullptr ? adventurer->get_name() : "No attempt recorded.";
 	}
 	std::string join_reward(GoldFameData& reward) const
@@ -175,7 +175,7 @@ private:
 	
 	std::string quest_dispatch_detail(GameDataManager& game_data_manager, int quest_id) const
 	{
-		const auto&& quest = game_data_manager.quests->find_quest(quest_id);
+		const auto quest = game_data_manager.quests->find_quest(quest_id);
 		
 		return (quest->state.get_value() == QuestStateEnum::Success)
 			? "You have completed this quest with your adventurer.\n" + quest_detail(game_data_manager, *quest)

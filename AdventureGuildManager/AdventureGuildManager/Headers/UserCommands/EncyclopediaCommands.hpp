@@ -14,7 +14,7 @@ public:
 		return command_context.size() == 1
 			&& (command_context[0] == "encyclopedia" || command_context[0] == "e");
 	}
-	std::string execute(GameDataManager& game_data) override
+	std::string execute([[maybe_unused]] GameDataManager& game_data) override
 	{
 		return interface.display_default();
 	}

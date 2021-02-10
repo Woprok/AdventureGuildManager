@@ -14,7 +14,7 @@ public:
 		return command_context.size() == 1
 			&& (command_context[0] == "adventurer" || command_context[0] == "a");
 	}
-	std::string execute(GameDataManager& game_data_manager) override
+	std::string execute([[maybe_unused]] GameDataManager& game_data_manager) override
 	{
 		return interface.display_default();
 	}

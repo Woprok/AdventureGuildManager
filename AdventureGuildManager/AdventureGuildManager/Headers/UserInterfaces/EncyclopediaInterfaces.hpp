@@ -9,7 +9,7 @@ public:
 	EncyclopediaInterfaces() = default;
 	~EncyclopediaInterfaces() override = default;
 
-	std::string display_default() override
+	std::string display_default() const override
 	{
 		std::ostringstream result_stream;
 		result_stream << "Encyclopedia Commands:\n";
@@ -120,7 +120,7 @@ private:
 	std::string list_skills(const GameDataManager& game_data_manager) const
 	{
 		std::ostringstream result;
-		for (auto&& item : game_data_manager.skills->get_defined_skills())
+		for (const auto& item : game_data_manager.skills->get_defined_skills())
 		{
 			result << skill_detail(item);
 		}
@@ -135,7 +135,5 @@ private:
 		}
 		return result.str();
 	}
-private:
-	
 };
 #endif
