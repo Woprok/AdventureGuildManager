@@ -7,9 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AdventureGuildManager", "Ad
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{2E4EBF8F-F7E3-4DAF-BC85-1AFD3D73F2B2}"
 	ProjectSection(SolutionItems) = preProject
-		Documentation\CurrentSpecification.md = Documentation\CurrentSpecification.md
-		Documentation\ImplementationSpecification.md = Documentation\ImplementationSpecification.md
-		Documentation\OriginalSpecification.md = Documentation\OriginalSpecification.md
+		Documentation\OLD_CurrentSpecification.md = Documentation\OLD_CurrentSpecification.md
+		Documentation\OLD_ImplementationSpecification.md = Documentation\OLD_ImplementationSpecification.md
+		Documentation\OLD_OriginalSpecification.md = Documentation\OLD_OriginalSpecification.md
+		Documentation\ProgrammerDocumentation.md = Documentation\ProgrammerDocumentation.md
+		Documentation\UserDocumentation.md = Documentation\UserDocumentation.md
 	EndProjectSection
 EndProject
 Global
